@@ -22,6 +22,7 @@ export const MODULES: ModuleConfig[] = [
   { slug: 'crm',         label: 'CRM e Mercado',         icon: 'Users',          description: 'Clientes, leads e prospecção' },
   { slug: 'financeiro',  label: 'Financeiro',            icon: 'DollarSign',     description: 'Controle financeiro e folha' },
   { slug: 'relatorios',  label: 'Relatórios',            icon: 'BarChart2',      description: 'Dashboards e analytics' },
+  { slug: 'organograma', label: 'Organograma',            icon: 'Network',        description: 'Hierarquia e organização' },
 ]
 
 export const PRODUCTS: ProductConfig[] = [

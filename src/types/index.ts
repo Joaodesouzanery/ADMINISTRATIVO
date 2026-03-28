@@ -15,6 +15,14 @@ export interface KanbanCard {
   tags?: string[]
   assignee?: string
   createdAt: string
+  subtasks?: Subtask[]
+  contactId?: string
+}
+
+export interface Subtask {
+  id: string
+  label: string
+  done: boolean
 }
 
 export interface KanbanColumn {
@@ -42,6 +50,10 @@ export interface ChecklistItem {
   id: string
   label: string
   done: boolean
+  assignee?: string
+  priority?: Priority
+  dueDate?: string
+  notes?: string
 }
 
 export interface Routine {
@@ -50,6 +62,55 @@ export interface Routine {
   description?: string
   frequency: RoutineFrequency
   items: ChecklistItem[]
+  assignee?: string
+  priority?: Priority
+  dueDate?: string
+  notes?: string
+  createdAt: string
+}
+
+// ─── Standalone Tasks ────────────────────────────────────────────────────────
+export interface Task {
+  id: string
+  title: string
+  description?: string
+  priority: Priority
+  date: string
+  completionDate?: string
+  tags?: string[]
+  completed: boolean
+  completedAt?: string
+  createdAt: string
+  alertDaysBefore?: number
+  contactId?: string
+}
+
+// ─── Planning ────────────────────────────────────────────────────────────────
+export type PlanningHorizon = 'short' | 'medium' | 'long'
+export type PlanningStatus = 'not_started' | 'in_progress' | 'completed' | 'cancelled'
+
+export interface PlanningGoal {
+  id: string
+  title: string
+  description?: string
+  category: string
+  status: PlanningStatus
+  horizon: PlanningHorizon
+  startDate: string
+  endDate: string
+  okr?: string
+  relatedProject?: string
+  createdAt: string
+}
+
+// ─── Notifications ───────────────────────────────────────────────────────────
+export interface Notification {
+  id: string
+  type: 'task_deadline' | 'planning_deadline' | 'general'
+  title: string
+  message: string
+  referenceId?: string
+  read: boolean
   createdAt: string
 }
 
@@ -95,6 +156,38 @@ export interface Deal {
   value: number
   probability: number
   expectedClose: string
+  createdAt: string
+}
+
+// ─── CRM Contacts / Partners ─────────────────────────────────────────────────
+export type ContactPipelineStage = 'new' | 'contacted' | 'engaged' | 'proposal' | 'closed'
+export type EntityType = 'contact' | 'partner'
+
+export interface Contact {
+  id: string
+  type: EntityType
+  name: string
+  email?: string
+  phone?: string
+  company?: string
+  project?: string
+  pipelineStage: ContactPipelineStage
+  observations?: string
+  linkedTaskIds?: string[]
+  createdAt: string
+}
+
+// ─── Organograma ─────────────────────────────────────────────────────────────
+export type OrgNodeType = 'company' | 'department' | 'person' | 'client' | 'associate'
+
+export interface OrgNode {
+  id: string
+  parentId: string | null
+  label: string
+  type: OrgNodeType
+  role?: string
+  email?: string
+  phone?: string
   createdAt: string
 }
 

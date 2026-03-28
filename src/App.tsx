@@ -13,6 +13,8 @@ import { DocumentsPage as IRDocuments } from './pages/iris/DocumentsPage'
 import { CRMPage as IRCRM } from './pages/iris/CRMPage'
 import { FinancialPage as IRFinancial } from './pages/iris/FinancialPage'
 import { AnalyticsPage as IRAnalytics } from './pages/iris/AnalyticsPage'
+import { OrgChartPage as CDOrgChart } from './pages/construdata/OrgChartPage'
+import { OrgChartPage as IROrgChart } from './pages/iris/OrgChartPage'
 
 export default function App() {
   return (
@@ -27,6 +29,7 @@ export default function App() {
           <Route path="crm"        element={<CDCRM />} />
           <Route path="financeiro" element={<CDFinancial />} />
           <Route path="relatorios" element={<CDAnalytics />} />
+          <Route path="organograma" element={<CDOrgChart />} />
         </Route>
 
         <Route path="/iris" element={<ProductLayout product="iris" />}>
@@ -36,6 +39,7 @@ export default function App() {
           <Route path="crm"        element={<IRCRM />} />
           <Route path="financeiro" element={<IRFinancial />} />
           <Route path="relatorios" element={<IRAnalytics />} />
+          <Route path="organograma" element={<IROrgChart />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

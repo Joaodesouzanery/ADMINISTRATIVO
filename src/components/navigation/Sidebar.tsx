@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Kanban, FileText, Users, DollarSign, BarChart2, ChevronLeft, ArrowLeftRight } from 'lucide-react'
+import { Kanban, FileText, Users, DollarSign, BarChart2, Network, ChevronLeft, ArrowLeftRight } from 'lucide-react'
 import { Logo } from '../brand/Logo'
 import { useAppStore } from '../../store/appStore'
 import { getProduct } from '../../config/products'
@@ -11,6 +11,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number }>> = {
   Users,
   DollarSign,
   BarChart2,
+  Network,
 }
 
 interface SidebarProps {

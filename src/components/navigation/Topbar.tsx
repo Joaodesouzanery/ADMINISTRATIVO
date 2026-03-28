@@ -1,7 +1,8 @@
 import { useLocation } from 'react-router-dom'
-import { Bell, User } from 'lucide-react'
+import { User } from 'lucide-react'
 import { getProduct, MODULES } from '../../config/products'
 import type { ProductKey } from '../../config/products'
+import { NotificationBell } from '../notifications/NotificationBell'
 
 interface TopbarProps {
   product: ProductKey
@@ -20,10 +21,7 @@ export function Topbar({ product }: TopbarProps) {
         <p className="text-xs text-navy-400">{config.fullName}</p>
       </div>
       <div className="flex items-center gap-3">
-        <button className="relative p-2 rounded-lg text-navy-400 hover:text-navy-800 hover:bg-surface transition-colors">
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full" />
-        </button>
+        <NotificationBell product={product} />
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center">
             <User size={16} className="text-cyan-400" />

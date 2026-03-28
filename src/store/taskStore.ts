@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { KanbanCard, KanbanColumn, Goal, Routine, ChecklistItem, ProductKey } from '../types'
+import type { KanbanCard, KanbanColumn, Goal, Routine, ChecklistItem, Task, PlanningGoal, ProductKey } from '../types'
 import * as cdTasks from '../data/construdata/tasks'
 import * as irisTasks from '../data/iris/tasks'
 
@@ -9,6 +9,8 @@ interface TaskState {
   cards: Record<ProductKey, KanbanCard[]>
   goals: Record<ProductKey, Goal[]>
   routines: Record<ProductKey, Routine[]>
+  tasks: Record<ProductKey, Task[]>
+  planningGoals: Record<ProductKey, PlanningGoal[]>
 
   // Cards
   moveCard: (cardId: string, targetColumnId: string, product: ProductKey) => void
@@ -28,6 +30,17 @@ interface TaskState {
   toggleChecklistItem: (routineId: string, itemId: string, product: ProductKey) => void
   addChecklistItem: (routineId: string, label: string, product: ProductKey) => void
   deleteChecklistItem: (routineId: string, itemId: string, product: ProductKey) => void
+
+  // Tasks
+  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'completed' | 'completedAt'>, product: ProductKey) => void
+  updateTask: (id: string, patch: Partial<Task>, product: ProductKey) => void
+  deleteTask: (id: string, product: ProductKey) => void
+  toggleTaskCompleted: (id: string, product: ProductKey) => void
+
+  // Planning
+  addPlanningGoal: (goal: Omit<PlanningGoal, 'id' | 'createdAt'>, product: ProductKey) => void
+  updatePlanningGoal: (id: string, patch: Partial<PlanningGoal>, product: ProductKey) => void
+  deletePlanningGoal: (id: string, product: ProductKey) => void
 }
 
 const uid = () => Math.random().toString(36).slice(2, 9)
@@ -41,6 +54,8 @@ export const useTaskStore = create<TaskState>()(
       cards: { construdata: cdTasks.cards, iris: irisTasks.cards },
       goals: { construdata: cdTasks.goals, iris: irisTasks.goals },
       routines: { construdata: defaultRoutines, iris: defaultRoutines },
+      tasks: { construdata: [], iris: [] },
+      planningGoals: { construdata: [], iris: [] },
 
       moveCard: (cardId, targetColumnId, product) =>
         set((s) => ({
@@ -146,6 +161,61 @@ export const useTaskStore = create<TaskState>()(
                 : r
             ),
           },
+        })),
+      // ─── Tasks ─────────────────────────────────────────────────────────
+      addTask: (task, product) =>
+        set((s) => ({
+          tasks: {
+            ...s.tasks,
+            [product]: [...s.tasks[product], { ...task, id: uid(), completed: false, createdAt: new Date().toISOString() }],
+          },
+        })),
+
+      updateTask: (id, patch, product) =>
+        set((s) => ({
+          tasks: {
+            ...s.tasks,
+            [product]: s.tasks[product].map((t) => (t.id === id ? { ...t, ...patch } : t)),
+          },
+        })),
+
+      deleteTask: (id, product) =>
+        set((s) => ({
+          tasks: { ...s.tasks, [product]: s.tasks[product].filter((t) => t.id !== id) },
+        })),
+
+      toggleTaskCompleted: (id, product) =>
+        set((s) => ({
+          tasks: {
+            ...s.tasks,
+            [product]: s.tasks[product].map((t) =>
+              t.id === id
+                ? { ...t, completed: !t.completed, completedAt: !t.completed ? new Date().toISOString() : undefined }
+                : t
+            ),
+          },
+        })),
+
+      // ─── Planning Goals ──────────────────────────────────────────────────
+      addPlanningGoal: (goal, product) =>
+        set((s) => ({
+          planningGoals: {
+            ...s.planningGoals,
+            [product]: [...s.planningGoals[product], { ...goal, id: uid(), createdAt: new Date().toISOString() }],
+          },
+        })),
+
+      updatePlanningGoal: (id, patch, product) =>
+        set((s) => ({
+          planningGoals: {
+            ...s.planningGoals,
+            [product]: s.planningGoals[product].map((g) => (g.id === id ? { ...g, ...patch } : g)),
+          },
+        })),
+
+      deletePlanningGoal: (id, product) =>
+        set((s) => ({
+          planningGoals: { ...s.planningGoals, [product]: s.planningGoals[product].filter((g) => g.id !== id) },
         })),
     }),
     { name: 'atlantico-tasks' }

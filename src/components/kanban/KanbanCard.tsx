@@ -3,11 +3,11 @@ import { useState } from 'react'
 import type { KanbanCard, Priority } from '../../types'
 import { Badge } from '../ui/Badge'
 
-const priorityConfig: Record<Priority, { label: string; variant: 'danger' | 'warning' | 'info' | 'default' }> = {
-  urgent: { label: 'Urgente', variant: 'danger' },
-  high:   { label: 'Alta',    variant: 'warning' },
-  medium: { label: 'Média',   variant: 'info' },
-  low:    { label: 'Baixa',   variant: 'default' },
+const priorityConfig: Record<Priority, { label: string; variant: 'danger' | 'warning' | 'info' | 'default'; border: string }> = {
+  urgent: { label: 'Urgente', variant: 'danger',  border: 'border-l-red-500' },
+  high:   { label: 'Alta',    variant: 'warning', border: 'border-l-amber-500' },
+  medium: { label: 'Média',   variant: 'info',    border: 'border-l-cyan-500' },
+  low:    { label: 'Baixa',   variant: 'default', border: 'border-l-navy-200' },
 }
 
 interface Props {
@@ -21,11 +21,14 @@ export function KanbanCardComp({ card, onDragStart, onDelete, onEdit }: Props) {
   const [menu, setMenu] = useState(false)
   const p = priorityConfig[card.priority]
 
+  const subtasksDone = card.subtasks?.filter((s) => s.done).length ?? 0
+  const subtasksTotal = card.subtasks?.length ?? 0
+
   return (
     <div
       draggable
       onDragStart={onDragStart}
-      className="bg-white rounded-lg p-3 shadow-card border border-cyan-100/50 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow relative group"
+      className={`bg-white rounded-lg p-3 shadow-card border border-cyan-100/50 border-l-4 ${p.border} cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow relative group`}
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-medium text-navy-800 leading-snug flex-1">{card.title}</p>
@@ -53,18 +56,45 @@ export function KanbanCardComp({ card, onDragStart, onDelete, onEdit }: Props) {
         <p className="text-xs text-navy-400 mt-1 line-clamp-2">{card.description}</p>
       )}
 
+      {/* Tags */}
+      {card.tags && card.tags.length > 0 && (
+        <div className="flex gap-1 mt-2 flex-wrap">
+          {card.tags.slice(0, 3).map((tag) => (
+            <span key={tag} className="px-1.5 py-0.5 bg-surface rounded text-[10px] text-navy-500 font-medium">{tag}</span>
+          ))}
+          {card.tags.length > 3 && <span className="text-[10px] text-navy-400">+{card.tags.length - 3}</span>}
+        </div>
+      )}
+
+      {/* Subtask progress */}
+      {subtasksTotal > 0 && (
+        <div className="flex items-center gap-2 mt-2">
+          <div className="flex-1 h-1 bg-navy-100 rounded-full overflow-hidden">
+            <div className="h-full bg-cyan-400 rounded-full transition-all" style={{ width: `${(subtasksDone / subtasksTotal) * 100}%` }} />
+          </div>
+          <span className="text-[10px] text-navy-400">{subtasksDone}/{subtasksTotal}</span>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mt-2 flex-wrap gap-1">
         <Badge variant={p.variant}>{p.label}</Badge>
-        {card.dueDate && (
-          <span className="flex items-center gap-1 text-xs text-navy-400">
-            <Calendar size={11} />
-            {new Date(card.dueDate).toLocaleDateString('pt-BR')}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {card.dueDate && (
+            <span className="flex items-center gap-1 text-xs text-navy-400">
+              <Calendar size={11} />
+              {new Date(card.dueDate).toLocaleDateString('pt-BR')}
+            </span>
+          )}
+        </div>
       </div>
 
       {card.assignee && (
-        <p className="text-xs text-navy-400 mt-1.5">{card.assignee}</p>
+        <div className="flex items-center gap-1.5 mt-1.5">
+          <div className="w-5 h-5 rounded-full bg-navy-800 flex items-center justify-center">
+            <span className="text-[9px] text-cyan-400 font-bold">{card.assignee.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()}</span>
+          </div>
+          <p className="text-xs text-navy-400">{card.assignee}</p>
+        </div>
       )}
     </div>
   )
