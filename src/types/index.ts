@@ -35,6 +35,24 @@ export interface Goal {
   status: 'on_track' | 'at_risk' | 'completed' | 'delayed'
 }
 
+// ─── Routines / Checklists ────────────────────────────────────────────────────
+export type RoutineFrequency = 'daily' | 'weekly' | 'monthly'
+
+export interface ChecklistItem {
+  id: string
+  label: string
+  done: boolean
+}
+
+export interface Routine {
+  id: string
+  title: string
+  description?: string
+  frequency: RoutineFrequency
+  items: ChecklistItem[]
+  createdAt: string
+}
+
 // ─── Documents ───────────────────────────────────────────────────────────────
 export type DocType = 'document' | 'contract' | 'report' | 'prompt'
 
@@ -82,6 +100,7 @@ export interface Deal {
 
 // ─── Financial ───────────────────────────────────────────────────────────────
 export type TransactionType = 'income' | 'expense'
+export type RecurrenceType = 'once' | 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'annual'
 
 export interface Transaction {
   id: string
@@ -92,7 +111,9 @@ export interface Transaction {
   date: string
   dueDate?: string
   paid: boolean
+  recurrence: RecurrenceType
   notes?: string
+  createdAt: string
 }
 
 export interface PayrollEntry {
@@ -105,6 +126,22 @@ export interface PayrollEntry {
   netSalary: number
   month: string
   status: 'pending' | 'paid'
+}
+
+export interface OKRKeyResult {
+  id: string
+  description: string
+  target: number
+  current: number
+  unit: string
+}
+
+export interface FinancialOKR {
+  id: string
+  objective: string
+  keyResults: OKRKeyResult[]
+  period: string
+  status: 'on_track' | 'at_risk' | 'completed'
 }
 
 // ─── Analytics ───────────────────────────────────────────────────────────────

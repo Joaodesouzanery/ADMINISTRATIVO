@@ -27,7 +27,7 @@ const emptyClient = { name: '', company: '', email: '', phone: '', status: 'pros
 const emptyDeal = { title: '', clientId: '', clientName: '', stage: 'lead' as DealStage, value: '', probability: '', expectedClose: '' }
 
 export function CRMPage() {
-  const { clients, deals, addClient, deleteClient, updateClient, addDeal, deleteDeal } = useCRMStore()
+  const { clients, deals, addClient, deleteClient, updateClient, addDeal, deleteDeal, updateDeal } = useCRMStore()
   const [tab, setTab] = useState<'clients' | 'pipeline'>('clients')
   const [search, setSearch] = useState('')
   const [addingClient, setAddingClient] = useState(false)
@@ -35,6 +35,7 @@ export function CRMPage() {
   const [clientForm, setClientForm] = useState(emptyClient)
   const [dealForm, setDealForm] = useState(emptyDeal)
   const [editingClient, setEditingClient] = useState<Client | null>(null)
+  const [editingDeal, setEditingDeal] = useState<Deal | null>(null)
 
   const prodClients = clients[PRODUCT]
   const prodDeals = deals[PRODUCT]
@@ -133,6 +134,7 @@ export function CRMPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={stageBadge[deal.stage] as 'default' | 'info' | 'warning' | 'success' | 'danger'}>{stageLabel[deal.stage]}</Badge>
+                  <button onClick={() => setEditingDeal(deal)} className="p-1 rounded text-navy-300 hover:text-navy-700"><Edit2 size={13} /></button>
                   <button onClick={() => deleteDeal(deal.id, PRODUCT)} className="p-1 rounded text-navy-300 hover:text-red-500"><Trash2 size={13} /></button>
                 </div>
               </div>
@@ -203,6 +205,29 @@ export function CRMPage() {
             <div className="flex gap-2 pt-2">
               <Button onClick={() => { updateClient(editingClient.id, editingClient, PRODUCT); setEditingClient(null) }}>Salvar</Button>
               <Button variant="secondary" onClick={() => setEditingClient(null)}>Cancelar</Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Edit Deal Modal */}
+      <Modal open={!!editingDeal} onClose={() => setEditingDeal(null)} title="Editar Negócio">
+        {editingDeal && (
+          <div className="space-y-3">
+            <Input label="Título" value={editingDeal.title} onChange={(e) => setEditingDeal({ ...editingDeal, title: e.target.value })} />
+            <div className="grid grid-cols-2 gap-3">
+              <Select label="Estágio" value={editingDeal.stage} onChange={(e) => setEditingDeal({ ...editingDeal, stage: e.target.value as DealStage })}>
+                {Object.entries(stageLabel).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+              </Select>
+              <Input label="Probabilidade (%)" type="number" value={String(editingDeal.probability)} onChange={(e) => setEditingDeal({ ...editingDeal, probability: Number(e.target.value) })} />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Input label="Valor (R$)" type="number" value={String(editingDeal.value)} onChange={(e) => setEditingDeal({ ...editingDeal, value: Number(e.target.value) })} />
+              <Input label="Fechamento previsto" type="date" value={editingDeal.expectedClose} onChange={(e) => setEditingDeal({ ...editingDeal, expectedClose: e.target.value })} />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button onClick={() => { updateDeal(editingDeal.id, editingDeal, PRODUCT); setEditingDeal(null) }}>Salvar</Button>
+              <Button variant="secondary" onClick={() => setEditingDeal(null)}>Cancelar</Button>
             </div>
           </div>
         )}

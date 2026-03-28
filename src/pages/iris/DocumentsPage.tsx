@@ -1,6 +1,6 @@
 // Re-uses same UI as ConstruData documents but with IRIS product key
 import { useState } from 'react'
-import { Plus, FileText, FileCheck2, BarChart, Bot, Search, Trash2, Eye } from 'lucide-react'
+import { Plus, FileText, FileCheck2, BarChart, Bot, Search, Trash2, Eye, Edit2 } from 'lucide-react'
 import { useDocumentStore } from '../../store/documentStore'
 import { Card } from '../../components/ui/Card'
 import { Button } from '../../components/ui/Button'
@@ -22,13 +22,24 @@ const typeBadge: Record<DocType, 'default' | 'info' | 'warning' | 'success'> = {
 }
 
 export function DocumentsPage() {
-  const { documents, addDocument, deleteDocument } = useDocumentStore()
+  const { documents, addDocument, updateDocument, deleteDocument } = useDocumentStore()
   const docs = documents[PRODUCT]
   const [search, setSearch] = useState('')
   const [filterType, setFilterType] = useState<DocType | 'all'>('all')
   const [adding, setAdding] = useState(false)
+  const [editing, setEditing] = useState<Document | null>(null)
   const [viewing, setViewing] = useState<Document | null>(null)
   const [form, setForm] = useState({ title: '', type: 'document' as DocType, category: '', content: '', version: '1.0', tags: '' })
+
+  function openEdit(doc: Document) {
+    setEditing(doc)
+    setForm({ title: doc.title, type: doc.type, category: doc.category, content: doc.content ?? '', version: doc.version, tags: (doc.tags ?? []).join(', ') })
+  }
+  function saveEdit() {
+    if (!editing || !form.title) return
+    updateDocument(editing.id, { title: form.title, type: form.type, category: form.category, content: form.content, version: form.version, tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean) }, PRODUCT)
+    setEditing(null)
+  }
 
   const filtered = docs.filter((d) => {
     return (d.title.toLowerCase().includes(search.toLowerCase()) || d.category.toLowerCase().includes(search.toLowerCase())) && (filterType === 'all' || d.type === filterType)
@@ -72,6 +83,7 @@ export function DocumentsPage() {
               <p className="text-xs text-navy-400 mt-2">Atualizado: {new Date(doc.updatedAt).toLocaleDateString('pt-BR')}</p>
               <div className="flex gap-2 mt-3">
                 <Button variant="ghost" size="sm" onClick={() => setViewing(doc)}><Eye size={13} /> Ver</Button>
+                <Button variant="ghost" size="sm" onClick={() => openEdit(doc)}><Edit2 size={13} /> Editar</Button>
                 <Button variant="ghost" size="sm" onClick={() => deleteDocument(doc.id, PRODUCT)} className="text-red-500 hover:bg-red-50"><Trash2 size={13} /></Button>
               </div>
             </Card>
@@ -100,6 +112,28 @@ export function DocumentsPage() {
               setAdding(false); setForm({ title: '', type: 'document', category: '', content: '', version: '1.0', tags: '' })
             }}>Salvar</Button>
             <Button variant="secondary" onClick={() => setAdding(false)}>Cancelar</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Edit modal */}
+      <Modal open={!!editing} onClose={() => setEditing(null)} title="Editar Documento" size="lg">
+        <div className="space-y-3">
+          <Input label="Título" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+          <div className="grid grid-cols-2 gap-3">
+            <Select label="Tipo" value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as DocType })}>
+              <option value="document">Documento</option><option value="contract">Contrato</option><option value="report">Relatório</option><option value="prompt">Prompt IA</option>
+            </Select>
+            <Input label="Categoria" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Versão" value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} />
+            <Input label="Tags (vírgula)" value={form.tags} onChange={(e) => setForm({ ...form, tags: e.target.value })} />
+          </div>
+          <Textarea label="Conteúdo" value={form.content} rows={5} onChange={(e) => setForm({ ...form, content: e.target.value })} />
+          <div className="flex gap-2 pt-2">
+            <Button onClick={saveEdit}>Salvar</Button>
+            <Button variant="secondary" onClick={() => setEditing(null)}>Cancelar</Button>
           </div>
         </div>
       </Modal>
