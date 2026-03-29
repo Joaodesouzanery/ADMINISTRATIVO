@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { Logo } from '../components/brand/Logo'
 import { PRODUCTS } from '../config/products'
-import { ArrowRight, Kanban, FileText, Users, DollarSign, BarChart2 } from 'lucide-react'
+import { ArrowRight, Kanban, FileText, Users, DollarSign, BarChart2, Network } from 'lucide-react'
 
-const MODULE_ICONS = [Kanban, FileText, Users, DollarSign, BarChart2]
+const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  LayoutKanban: Kanban, FileText, Users, DollarSign, BarChart2, Network,
+}
 
 export function Home() {
   const navigate = useNavigate()
@@ -53,8 +55,8 @@ export function Home() {
 
               {/* Modules preview */}
               <div className="flex flex-wrap gap-2 mt-4">
-                {product.modules.map((mod, i) => {
-                  const Icon = MODULE_ICONS[i]
+                {product.modules.map((mod) => {
+                  const Icon = ICON_MAP[mod.icon] ?? Network
                   return (
                     <div key={mod.slug} className="flex items-center gap-1.5 bg-navy-800/60 rounded-lg px-2.5 py-1.5">
                       <Icon size={12} className="text-cyan-400" />
