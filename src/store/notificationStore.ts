@@ -15,7 +15,7 @@ interface NotificationState {
 export const useNotificationStore = create<NotificationState>()(
   persist(
     (set) => ({
-      notifications: { construdata: [], iris: [] },
+      notifications: { construdata: [], iris: [], padrao: [] },
 
       addNotification: (n, product) =>
         set((s) => ({

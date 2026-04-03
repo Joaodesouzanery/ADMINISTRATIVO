@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { Logo } from '../components/brand/Logo'
 import { PRODUCTS } from '../config/products'
-import { ArrowRight, Kanban, FileText, Users, DollarSign, BarChart2, Network } from 'lucide-react'
+import { ArrowRight, Kanban, FileText, Users, DollarSign, BarChart2, Network, CalendarRange, ShieldAlert } from 'lucide-react'
 
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-  LayoutKanban: Kanban, FileText, Users, DollarSign, BarChart2, Network,
+  LayoutKanban: Kanban, FileText, Users, DollarSign, BarChart2, Network, CalendarRange, ShieldAlert,
 }
 
 export function Home() {
@@ -34,11 +34,11 @@ export function Home() {
         </div>
 
         {/* Product cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
           {PRODUCTS.map((product) => (
             <button
               key={product.key}
-              onClick={() => navigate(`/${product.key}/projetos`)}
+              onClick={() => navigate(`/${product.key}/${product.modules[0]?.slug ?? 'projetos'}`)}
               className="group bg-navy-700/50 backdrop-blur border border-navy-600 hover:border-cyan-400/40 rounded-2xl p-7 text-left transition-all duration-200 hover:bg-navy-700/80 hover:shadow-kpi"
             >
               <div className="flex items-start justify-between mb-4">

@@ -16,6 +16,9 @@ import { AnalyticsPage as IRAnalytics } from './pages/iris/AnalyticsPage'
 import { OrgChartPage as CDOrgChart } from './pages/construdata/OrgChartPage'
 import { OrgChartPage as IROrgChart } from './pages/iris/OrgChartPage'
 
+import { AgendaDinamicaPage as PDAgenda } from './pages/padrao/AgendaDinamicaPage'
+import { RegrasAlertasPage as PDRegras } from './pages/padrao/RegrasAlertasPage'
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -40,6 +43,12 @@ export default function App() {
           <Route path="financeiro" element={<IRFinancial />} />
           <Route path="relatorios" element={<IRAnalytics />} />
           <Route path="organograma" element={<IROrgChart />} />
+        </Route>
+
+        <Route path="/padrao" element={<ProductLayout product="padrao" />}>
+          <Route index element={<Navigate to="agenda" replace />} />
+          <Route path="agenda" element={<PDAgenda />} />
+          <Route path="regras" element={<PDRegras />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

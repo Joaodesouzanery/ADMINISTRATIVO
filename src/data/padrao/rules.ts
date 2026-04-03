@@ -1,0 +1,187 @@
+import type { Rule, Alert, RuleProposal } from '../../types'
+
+export const initialRules: Rule[] = [
+  {
+    id: 'rule-1',
+    name: 'Certificações inválidas para turno',
+    description: 'Verificar se todos os operadores possuem certificações válidas para o turno atribuído',
+    author: 'Ana Silva',
+    createdAt: '2025-01-26T15:53:00',
+    updatedAt: '2025-01-26T15:53:00',
+    status: 'ativa',
+    objectNodes: [
+      { id: 'on1', label: 'Atribuição de Operador', type: 'assignment', parentId: null },
+      { id: 'on2', label: 'Operador', type: 'operator', parentId: 'on1' },
+    ],
+    conditionFilters: [
+      { id: 'cf1', field: 'certificação', operator: 'não contém', value: 'NR-10' },
+    ],
+    constraintType: 'HARD',
+    outputMapping: 'Violações de Atribuição',
+  },
+  {
+    id: 'rule-2',
+    name: 'Permissão de poço expirada',
+    description: 'Alertar quando a permissão de operação de um poço estiver expirada ou próxima do vencimento',
+    author: 'Ana Silva',
+    createdAt: '2025-01-26T15:37:00',
+    updatedAt: '2025-01-26T15:37:00',
+    status: 'ativa',
+    objectNodes: [
+      { id: 'on3', label: 'Recurso', type: 'resource', parentId: null },
+    ],
+    conditionFilters: [
+      { id: 'cf2', field: 'data_vencimento_permissão', operator: 'menor que', value: 'hoje + 30 dias' },
+    ],
+    constraintType: 'HARD',
+    outputMapping: 'Alertas de Permissão',
+  },
+  {
+    id: 'rule-3',
+    name: 'Limite de horas extras atingido',
+    description: 'Identificar operadores que atingiram o limite máximo de horas extras no período',
+    author: 'Ana Silva',
+    createdAt: '2025-01-26T15:19:00',
+    updatedAt: '2025-01-26T15:19:00',
+    status: 'ativa',
+    objectNodes: [
+      { id: 'on4', label: 'Atribuição de Operador', type: 'assignment', parentId: null },
+      { id: 'on5', label: 'Operador', type: 'operator', parentId: 'on4' },
+    ],
+    conditionFilters: [
+      { id: 'cf3', field: 'horas_extras_período', operator: 'maior que', value: '40' },
+    ],
+    constraintType: 'SOFT',
+    outputMapping: 'Alertas de Horas Extras',
+  },
+  {
+    id: 'rule-4',
+    name: 'Tarefa requer mínimo 2 operadores',
+    description: 'Garantir que tarefas críticas tenham pelo menos 2 operadores atribuídos',
+    author: 'Carlos Mendes',
+    createdAt: '2025-01-26T15:19:00',
+    updatedAt: '2025-01-26T15:19:00',
+    status: 'ativa',
+    objectNodes: [
+      { id: 'on6', label: 'Tarefa', type: 'task', parentId: null },
+      { id: 'on7', label: 'Atribuição de Operador', type: 'assignment', parentId: 'on6' },
+    ],
+    conditionFilters: [
+      { id: 'cf4', field: 'total_operadores', operator: 'menor que', value: '2' },
+      { id: 'cf5', field: 'fase', operator: 'igual a', value: 'perfuração', logicalOp: 'E' },
+    ],
+    constraintType: 'HARD',
+    outputMapping: 'Violações de Equipe Mínima',
+  },
+  {
+    id: 'rule-5',
+    name: 'Sem turnos consecutivos de 12h',
+    description: 'O acordo coletivo estipula que trabalhadores não podem fazer turnos consecutivos de 12 horas',
+    author: 'Ana Silva',
+    createdAt: '2025-01-26T14:45:00',
+    updatedAt: '2025-01-26T14:45:00',
+    status: 'ativa',
+    objectNodes: [
+      { id: 'on8', label: 'Atribuição de Operador', type: 'assignment', parentId: null },
+      { id: 'on9', label: 'Operador', type: 'operator', parentId: 'on8' },
+      { id: 'on10', label: 'Operador', type: 'operator', parentId: 'on9' },
+    ],
+    conditionFilters: [
+      { id: 'cf6', field: 'TURNO', operator: 'relativo a', value: 'fim menos que 720 minutos antes do início' },
+    ],
+    constraintType: 'HARD',
+    outputMapping: 'Violações de Atribuição',
+    streamingCondition: {
+      type: 'formula_threshold',
+      formula: '$horas_consecutivas > 12',
+      isValid: true,
+      variables: [
+        { name: 'horas_consecutivas', value: 'soma(duração_turno)' },
+      ],
+      triggerAction: 'Criar Alerta',
+      recoverAction: 'Recuperar Alerta',
+    },
+  },
+  {
+    id: 'rule-6',
+    name: 'Turnos de operadores não podem sobrepor',
+    description: 'Verificar se não há sobreposição de turnos para o mesmo operador',
+    author: 'Carlos Mendes',
+    createdAt: '2025-01-26T14:34:00',
+    updatedAt: '2025-01-26T14:34:00',
+    status: 'ativa',
+    objectNodes: [
+      { id: 'on11', label: 'Atribuição de Operador', type: 'assignment', parentId: null },
+      { id: 'on12', label: 'Operador', type: 'operator', parentId: 'on11' },
+    ],
+    conditionFilters: [
+      { id: 'cf7', field: 'período', operator: 'sobrepõe', value: 'outro turno do mesmo operador' },
+    ],
+    constraintType: 'HARD',
+    outputMapping: 'Violações de Sobreposição',
+  },
+]
+
+export const initialAlerts: Alert[] = [
+  {
+    id: 'alert-1',
+    ruleId: 'rule-1',
+    ruleName: 'Certificações inválidas para turno',
+    severity: 'critical',
+    message: 'Operador Chris Novak não possui certificação NR-10 exigida para o turno de perfuração em Garden City A-1',
+    triggeredAt: '2025-01-30T08:15:00',
+    resolved: false,
+  },
+  {
+    id: 'alert-2',
+    ruleId: 'rule-3',
+    ruleName: 'Limite de horas extras atingido',
+    severity: 'warning',
+    message: 'Operadora Nicole Souza atingiu 42h extras no período — limite de 40h ultrapassado',
+    triggeredAt: '2025-01-31T14:00:00',
+    resolved: false,
+  },
+  {
+    id: 'alert-3',
+    ruleId: 'rule-5',
+    ruleName: 'Sem turnos consecutivos de 12h',
+    severity: 'critical',
+    message: 'Operador Ryan Santos com 2 turnos consecutivos de 12h detectados (29/01 18h → 30/01 18h)',
+    triggeredAt: '2025-01-30T18:00:00',
+    resolved: true,
+    resolvedAt: '2025-01-30T19:30:00',
+    resolution: 'Turno reatribuído para operador Brad Costa',
+  },
+  {
+    id: 'alert-4',
+    ruleId: 'rule-2',
+    ruleName: 'Permissão de poço expirada',
+    severity: 'warning',
+    message: 'Permissão do recurso Garden City B-2 expira em 15 dias (vencimento: 15/02/2025)',
+    triggeredAt: '2025-01-31T09:00:00',
+    resolved: false,
+  },
+]
+
+export const initialProposals: RuleProposal[] = [
+  {
+    id: 'prop-1',
+    ruleId: 'rule-3',
+    ruleName: 'Limite de horas extras atingido',
+    author: 'Carlos Mendes',
+    description: 'Reduzir limite de horas extras de 40h para 36h conforme nova regulamentação trabalhista',
+    status: 'pendente',
+    createdAt: '2025-01-28T10:00:00',
+  },
+  {
+    id: 'prop-2',
+    ruleId: 'rule-4',
+    ruleName: 'Tarefa requer mínimo 2 operadores',
+    author: 'Ana Silva',
+    description: 'Incluir fase de manutenção na exigência de mínimo 2 operadores',
+    status: 'aprovada',
+    createdAt: '2025-01-25T14:00:00',
+    reviewedAt: '2025-01-26T09:00:00',
+    reviewer: 'Carlos Mendes',
+  },
+]

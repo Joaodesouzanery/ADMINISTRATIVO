@@ -25,9 +25,9 @@ interface CRMState {
 export const useCRMStore = create<CRMState>()(
   persist(
     (set) => ({
-      clients: { construdata: cdCrm.clients, iris: irisCrm.clients },
-      deals: { construdata: cdCrm.deals, iris: irisCrm.deals },
-      contacts: { construdata: [], iris: [] },
+      clients: { construdata: cdCrm.clients, iris: irisCrm.clients, padrao: [] },
+      deals: { construdata: cdCrm.deals, iris: irisCrm.deals, padrao: [] },
+      contacts: { construdata: [], iris: [], padrao: [] },
 
       addClient: (c, p) => set((s) => ({ clients: { ...s.clients, [p]: [...s.clients[p], { ...c, id: uid(), createdAt: new Date().toISOString() }] } })),
       updateClient: (id, patch, p) => set((s) => ({ clients: { ...s.clients, [p]: s.clients[p].map((c) => c.id === id ? { ...c, ...patch } : c) } })),

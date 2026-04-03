@@ -29,9 +29,9 @@ interface FinancialState {
 export const useFinancialStore = create<FinancialState>()(
   persist(
     (set) => ({
-      transactions: { construdata: cdFin.transactions, iris: irisFin.transactions },
-      payroll: { construdata: cdFin.payroll, iris: irisFin.payroll },
-      okrs: { construdata: cdFin.okrs, iris: irisFin.okrs },
+      transactions: { construdata: cdFin.transactions, iris: irisFin.transactions, padrao: [] },
+      payroll: { construdata: cdFin.payroll, iris: irisFin.payroll, padrao: [] },
+      okrs: { construdata: cdFin.okrs, iris: irisFin.okrs, padrao: [] },
 
       addTransaction: (t, p) => set((s) => ({
         transactions: {

@@ -50,12 +50,12 @@ const defaultRoutines: Routine[] = []
 export const useTaskStore = create<TaskState>()(
   persist(
     (set) => ({
-      columns: { construdata: cdTasks.columns, iris: irisTasks.columns },
-      cards: { construdata: cdTasks.cards, iris: irisTasks.cards },
-      goals: { construdata: cdTasks.goals, iris: irisTasks.goals },
-      routines: { construdata: defaultRoutines, iris: defaultRoutines },
-      tasks: { construdata: [], iris: [] },
-      planningGoals: { construdata: [], iris: [] },
+      columns: { construdata: cdTasks.columns, iris: irisTasks.columns, padrao: [] },
+      cards: { construdata: cdTasks.cards, iris: irisTasks.cards, padrao: [] },
+      goals: { construdata: cdTasks.goals, iris: irisTasks.goals, padrao: [] },
+      routines: { construdata: defaultRoutines, iris: defaultRoutines, padrao: [] },
+      tasks: { construdata: [], iris: [], padrao: [] },
+      planningGoals: { construdata: [], iris: [], padrao: [] },
 
       moveCard: (cardId, targetColumnId, product) =>
         set((s) => ({

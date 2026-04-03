@@ -1,8 +1,9 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Kanban, FileText, Users, DollarSign, BarChart2, Network, ChevronLeft, ArrowLeftRight } from 'lucide-react'
+import { Kanban, FileText, Users, DollarSign, BarChart2, Network, ChevronLeft, ArrowLeftRight, CalendarRange, ShieldAlert } from 'lucide-react'
 import { Logo } from '../brand/Logo'
 import { useAppStore } from '../../store/appStore'
-import { getProduct } from '../../config/products'
+import { getProduct, PRODUCTS } from '../../config/products'
 import type { ProductKey } from '../../config/products'
 
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number }>> = {
@@ -12,6 +13,8 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number }>> = {
   DollarSign,
   BarChart2,
   Network,
+  CalendarRange,
+  ShieldAlert,
 }
 
 interface SidebarProps {
@@ -22,8 +25,8 @@ export function Sidebar({ product }: SidebarProps) {
   const { sidebarOpen, toggleSidebar } = useAppStore()
   const navigate = useNavigate()
   const config = getProduct(product)
-  const other: ProductKey = product === 'construdata' ? 'iris' : 'construdata'
-  const otherConfig = getProduct(other)
+  const [switcherOpen, setSwitcherOpen] = useState(false)
+  const otherProducts = PRODUCTS.filter((p) => p.key !== product)
 
   return (
     <aside
@@ -81,15 +84,32 @@ export function Sidebar({ product }: SidebarProps) {
       </nav>
 
       {/* Switcher */}
-      <div className="p-3 border-t border-navy-700">
+      <div className="p-3 border-t border-navy-700 relative">
         <button
-          onClick={() => navigate(`/${other}/projetos`)}
+          onClick={() => setSwitcherOpen(!switcherOpen)}
           className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-navy-300 hover:text-white hover:bg-navy-700 transition-colors ${!sidebarOpen ? 'justify-center' : ''}`}
-          title={!sidebarOpen ? `Ir para ${otherConfig.name}` : undefined}
+          title={!sidebarOpen ? 'Trocar produto' : undefined}
         >
           <ArrowLeftRight size={14} />
-          {sidebarOpen && <span>Ir para {otherConfig.name}</span>}
+          {sidebarOpen && <span>Trocar produto</span>}
         </button>
+        {switcherOpen && (
+          <div className={`absolute bottom-full mb-1 bg-navy-700 border border-navy-600 rounded-lg shadow-modal overflow-hidden z-30 ${sidebarOpen ? 'left-3 right-3' : 'left-12 w-48'}`}>
+            {otherProducts.map((p) => {
+              const defaultSlug = p.modules[0]?.slug ?? 'projetos'
+              return (
+                <button
+                  key={p.key}
+                  onClick={() => { navigate(`/${p.key}/${defaultSlug}`); setSwitcherOpen(false) }}
+                  className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-navy-200 hover:text-white hover:bg-navy-600 transition-colors"
+                >
+                  <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+                  <span className="font-medium">{p.name}</span>
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
     </aside>
   )

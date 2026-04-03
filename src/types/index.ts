@@ -237,6 +237,133 @@ export interface FinancialOKR {
   status: 'on_track' | 'at_risk' | 'completed'
 }
 
+// ─── Scheduling (Agenda Dinâmica) ────────────────────────────────────────────
+export type ScheduleTaskPhase =
+  | 'mobilização'
+  | 'perfuração'
+  | 'desmobilização'
+  | 'movimentação'
+  | 'bombeamento'
+  | 'flowback'
+  | 'manutenção'
+  | 'inspeção'
+  | 'setup'
+
+export interface ScheduleOperator {
+  id: string
+  name: string
+  color: string
+  role?: string
+  certifications?: string[]
+}
+
+export interface ScheduleResource {
+  id: string
+  name: string
+  type: 'equipe' | 'equipamento' | 'local'
+  location?: string
+  status: 'ativo' | 'inativo' | 'manutenção'
+}
+
+export interface ScheduleTask {
+  id: string
+  resourceId: string
+  label: string
+  phase: ScheduleTaskPhase
+  startDate: string
+  endDate: string
+  operatorIds: string[]
+  color: string
+  order: number
+}
+
+export interface ScheduleKPI {
+  outputGlobal: number
+  receitaProjetadaAntes: number
+  receitaProjetadaDepois: number
+  variacaoPercentual: number
+  totalEquipe: number
+}
+
+export interface ScheduleScenario {
+  id: string
+  name: string
+  isNew?: boolean
+  resources: ScheduleResource[]
+  tasks: ScheduleTask[]
+  operators: ScheduleOperator[]
+  kpi: ScheduleKPI
+}
+
+// ─── Rules & Alerting (Regras e Alertas) ─────────────────────────────────────
+export type RuleConstraintType = 'HARD' | 'SOFT'
+export type RuleStatus = 'ativa' | 'inativa' | 'rascunho'
+export type AlertSeverity = 'info' | 'warning' | 'critical'
+export type ProposalStatus = 'pendente' | 'aprovada' | 'rejeitada'
+
+export interface RuleObjectNode {
+  id: string
+  label: string
+  type: string
+  parentId: string | null
+}
+
+export interface RuleConditionFilter {
+  id: string
+  field: string
+  operator: string
+  value: string
+  logicalOp?: 'E' | 'OU'
+}
+
+export interface StreamingConditionConfig {
+  type: 'formula_threshold' | 'anomaly_detection' | 'pattern_match'
+  formula: string
+  isValid: boolean
+  variables: { name: string; value: string }[]
+  triggerAction: string
+  recoverAction: string
+}
+
+export interface Rule {
+  id: string
+  name: string
+  description: string
+  author: string
+  createdAt: string
+  updatedAt: string
+  status: RuleStatus
+  objectNodes: RuleObjectNode[]
+  conditionFilters: RuleConditionFilter[]
+  constraintType: RuleConstraintType
+  outputMapping: string
+  streamingCondition?: StreamingConditionConfig
+}
+
+export interface Alert {
+  id: string
+  ruleId: string
+  ruleName: string
+  severity: AlertSeverity
+  message: string
+  triggeredAt: string
+  resolvedAt?: string
+  resolved: boolean
+  resolution?: string
+}
+
+export interface RuleProposal {
+  id: string
+  ruleId: string
+  ruleName: string
+  author: string
+  description: string
+  status: ProposalStatus
+  createdAt: string
+  reviewedAt?: string
+  reviewer?: string
+}
+
 // ─── Analytics ───────────────────────────────────────────────────────────────
 export interface ChartDataPoint {
   label: string

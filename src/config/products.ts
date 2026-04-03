@@ -1,4 +1,4 @@
-export type ProductKey = 'construdata' | 'iris'
+export type ProductKey = 'construdata' | 'iris' | 'padrao'
 
 export interface ModuleConfig {
   slug: string
@@ -25,6 +25,11 @@ export const MODULES: ModuleConfig[] = [
   { slug: 'organograma', label: 'Organograma',            icon: 'Network',        description: 'Hierarquia e organização' },
 ]
 
+export const PADRAO_MODULES: ModuleConfig[] = [
+  { slug: 'agenda', label: 'Agenda Dinâmica', icon: 'CalendarRange', description: 'Agendamento dinâmico e planejamento' },
+  { slug: 'regras', label: 'Regras e Alertas', icon: 'ShieldAlert', description: 'Regras e alertas em tempo real' },
+]
+
 export const PRODUCTS: ProductConfig[] = [
   {
     key: 'construdata',
@@ -41,6 +46,14 @@ export const PRODUCTS: ProductConfig[] = [
     color: '#7DD4A8',
     description: 'Plataforma de inteligência e dados empresariais',
     modules: MODULES,
+  },
+  {
+    key: 'padrao',
+    name: 'Padrão',
+    fullName: 'Atlântico Padrão',
+    color: '#F59E0B',
+    description: 'Módulo administrativo geral com agendamento dinâmico e alertas',
+    modules: PADRAO_MODULES,
   },
 ]
 

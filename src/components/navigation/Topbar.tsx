@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import { User } from 'lucide-react'
-import { getProduct, MODULES } from '../../config/products'
+import { getProduct } from '../../config/products'
 import type { ProductKey } from '../../config/products'
 import { NotificationBell } from '../notifications/NotificationBell'
 
@@ -11,8 +11,8 @@ interface TopbarProps {
 export function Topbar({ product }: TopbarProps) {
   const location = useLocation()
   const slug = location.pathname.split('/').pop()
-  const module = MODULES.find((m) => m.slug === slug)
   const config = getProduct(product)
+  const module = config.modules.find((m) => m.slug === slug)
 
   return (
     <header className="h-16 bg-white border-b border-cyan-100 flex items-center justify-between px-6 shrink-0 shadow-sm">
