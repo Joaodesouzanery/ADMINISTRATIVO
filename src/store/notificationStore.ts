@@ -47,6 +47,6 @@ export const useNotificationStore = create<NotificationState>()(
         deleteFromSupabase('notifications', id)
       },
     }),
-    { name: 'atlantico-notifications' }
+    { name: 'atlantico-notifications-v2' }
   )
 )

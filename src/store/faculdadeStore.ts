@@ -92,6 +92,6 @@ export const useFaculdadeStore = create<FaculdadeState>()(
           return { atividades: updated }
         }),
     }),
-    { name: 'atlantico-faculdade' }
+    { name: 'atlantico-faculdade-v2' }
   )
 )

@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Rule, Alert, RuleProposal, RuleConstraintType } from '../types'
-import { initialRules, initialAlerts, initialProposals } from '../data/padrao/rules'
 
 interface RulesState {
   rules: Rule[]
@@ -22,10 +21,10 @@ interface RulesState {
 export const useRulesStore = create<RulesState>()(
   persist(
     (set) => ({
-      rules: initialRules,
-      activeRuleId: initialRules[0]?.id ?? null,
-      alerts: initialAlerts,
-      proposals: initialProposals,
+      rules: [],
+      activeRuleId: null,
+      alerts: [],
+      proposals: [],
 
       setActiveRule: (id) => set({ activeRuleId: id }),
 
@@ -72,6 +71,6 @@ export const useRulesStore = create<RulesState>()(
           ),
         })),
     }),
-    { name: 'atlantico-rules' }
+    { name: 'atlantico-rules-v2' }
   )
 )

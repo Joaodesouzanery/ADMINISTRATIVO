@@ -1,7 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { ScheduleScenario } from '../types'
-import { initialScenarios } from '../data/padrao/scheduling'
 
 interface SchedulingState {
   scenarios: ScheduleScenario[]
@@ -16,8 +15,8 @@ interface SchedulingState {
 export const useSchedulingStore = create<SchedulingState>()(
   persist(
     (set) => ({
-      scenarios: initialScenarios,
-      activeScenarioId: 'scenario-1',
+      scenarios: [],
+      activeScenarioId: '',
 
       setActiveScenario: (id) => set({ activeScenarioId: id }),
 
@@ -58,6 +57,6 @@ export const useSchedulingStore = create<SchedulingState>()(
           ),
         })),
     }),
-    { name: 'atlantico-scheduling' }
+    { name: 'atlantico-scheduling-v2' }
   )
 )

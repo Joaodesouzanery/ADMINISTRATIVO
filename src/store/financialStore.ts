@@ -2,10 +2,9 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Transaction, PayrollEntry, FinancialOKR, OKRKeyResult, ProductKey } from '../types'
 import { insertToSupabase, updateInSupabase, deleteFromSupabase } from '../lib/supabaseSync'
-import * as cdFin from '../data/construdata/financial'
-import * as irisFin from '../data/iris/financial'
 
 const uid = () => Math.random().toString(36).slice(2, 9)
+const emptyByProduct = <T,>(): Record<ProductKey, T[]> => ({ construdata: [], iris: [], padrao: [], faculdade: [] })
 
 interface FinancialState {
   transactions: Record<ProductKey, Transaction[]>
@@ -24,9 +23,9 @@ interface FinancialState {
 export const useFinancialStore = create<FinancialState>()(
   persist(
     (set) => ({
-      transactions: { construdata: cdFin.transactions, iris: irisFin.transactions, padrao: [], faculdade: [] },
-      payroll: { construdata: cdFin.payroll, iris: irisFin.payroll, padrao: [], faculdade: [] },
-      okrs: { construdata: cdFin.okrs, iris: irisFin.okrs, padrao: [], faculdade: [] },
+      transactions: emptyByProduct<Transaction>(),
+      payroll: emptyByProduct<PayrollEntry>(),
+      okrs: emptyByProduct<FinancialOKR>(),
 
       addTransaction: (t, p) => {
         const n = { ...t, id: uid(), createdAt: new Date().toISOString() }
@@ -71,6 +70,6 @@ export const useFinancialStore = create<FinancialState>()(
           return { okrs: { ...s.okrs, [p]: newOkrs } }
         }),
     }),
-    { name: 'atlantico-financial' }
+    { name: 'atlantico-financial-v2' }
   )
 )

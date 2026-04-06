@@ -2,8 +2,6 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { KanbanCard, KanbanColumn, Goal, Routine, ChecklistItem, Task, PlanningGoal, ProductKey } from '../types'
 import { insertToSupabase, updateInSupabase, deleteFromSupabase } from '../lib/supabaseSync'
-import * as cdTasks from '../data/construdata/tasks'
-import * as irisTasks from '../data/iris/tasks'
 
 interface TaskState {
   columns: Record<ProductKey, KanbanColumn[]>
@@ -40,17 +38,17 @@ interface TaskState {
 }
 
 const uid = () => Math.random().toString(36).slice(2, 9)
-const defaultRoutines: Routine[] = []
+const emptyByProduct = <T,>(): Record<ProductKey, T[]> => ({ construdata: [], iris: [], padrao: [], faculdade: [] })
 
 export const useTaskStore = create<TaskState>()(
   persist(
     (set) => ({
-      columns: { construdata: cdTasks.columns, iris: irisTasks.columns, padrao: [], faculdade: [] },
-      cards: { construdata: cdTasks.cards, iris: irisTasks.cards, padrao: [], faculdade: [] },
-      goals: { construdata: cdTasks.goals, iris: irisTasks.goals, padrao: [], faculdade: [] },
-      routines: { construdata: defaultRoutines, iris: defaultRoutines, padrao: [], faculdade: [] },
-      tasks: { construdata: [], iris: [], padrao: [], faculdade: [] },
-      planningGoals: { construdata: [], iris: [], padrao: [], faculdade: [] },
+      columns: emptyByProduct<KanbanColumn>(),
+      cards: emptyByProduct<KanbanCard>(),
+      goals: emptyByProduct<Goal>(),
+      routines: emptyByProduct<Routine>(),
+      tasks: emptyByProduct<Task>(),
+      planningGoals: emptyByProduct<PlanningGoal>(),
 
       // ─── Cards ──────────────────────────────────────────────────────
       moveCard: (cardId, targetColumnId, product) => {
@@ -186,6 +184,6 @@ export const useTaskStore = create<TaskState>()(
         deleteFromSupabase('planning_goals', id)
       },
     }),
-    { name: 'atlantico-tasks' }
+    { name: 'atlantico-tasks-v2' }
   )
 )

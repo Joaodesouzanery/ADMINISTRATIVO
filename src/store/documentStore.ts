@@ -2,10 +2,9 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Document, ProductKey } from '../types'
 import { insertToSupabase, updateInSupabase, deleteFromSupabase } from '../lib/supabaseSync'
-import * as cdDocs from '../data/construdata/documents'
-import * as irisDocs from '../data/iris/documents'
 
 const uid = () => Math.random().toString(36).slice(2, 9)
+const emptyByProduct = <T,>(): Record<ProductKey, T[]> => ({ construdata: [], iris: [], padrao: [], faculdade: [] })
 
 interface DocumentState {
   documents: Record<ProductKey, Document[]>
@@ -17,7 +16,7 @@ interface DocumentState {
 export const useDocumentStore = create<DocumentState>()(
   persist(
     (set) => ({
-      documents: { construdata: cdDocs.documents, iris: irisDocs.documents, padrao: [], faculdade: [] },
+      documents: emptyByProduct<Document>(),
 
       addDocument: (d, p) => {
         const n = { ...d, id: uid(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
@@ -36,6 +35,6 @@ export const useDocumentStore = create<DocumentState>()(
         deleteFromSupabase('documents', id)
       },
     }),
-    { name: 'atlantico-documents' }
+    { name: 'atlantico-documents-v2' }
   )
 )

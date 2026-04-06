@@ -51,6 +51,6 @@ export const useComercialStore = create<ComercialState>()(
         updateInSupabase('comercial_contacts', id, { stage })
       },
     }),
-    { name: 'atlantico-comercial' }
+    { name: 'atlantico-comercial-v2' }
   )
 )

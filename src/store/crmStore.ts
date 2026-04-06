@@ -2,10 +2,9 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Client, Deal, Contact, ContactPipelineStage, ProductKey } from '../types'
 import { insertToSupabase, updateInSupabase, deleteFromSupabase } from '../lib/supabaseSync'
-import * as cdCrm from '../data/construdata/crm'
-import * as irisCrm from '../data/iris/crm'
 
 const uid = () => Math.random().toString(36).slice(2, 9)
+const emptyByProduct = <T,>(): Record<ProductKey, T[]> => ({ construdata: [], iris: [], padrao: [], faculdade: [] })
 
 interface CRMState {
   clients: Record<ProductKey, Client[]>
@@ -26,9 +25,9 @@ interface CRMState {
 export const useCRMStore = create<CRMState>()(
   persist(
     (set) => ({
-      clients: { construdata: cdCrm.clients, iris: irisCrm.clients, padrao: [], faculdade: [] },
-      deals: { construdata: cdCrm.deals, iris: irisCrm.deals, padrao: [], faculdade: [] },
-      contacts: { construdata: [], iris: [], padrao: [], faculdade: [] },
+      clients: emptyByProduct<Client>(),
+      deals: emptyByProduct<Deal>(),
+      contacts: emptyByProduct<Contact>(),
 
       addClient: (c, p) => { const n = { ...c, id: uid(), createdAt: new Date().toISOString() }; set((s) => ({ clients: { ...s.clients, [p]: [...s.clients[p], n] } })); insertToSupabase('clients', n, p) },
       updateClient: (id, patch, p) => { set((s) => ({ clients: { ...s.clients, [p]: s.clients[p].map((c) => c.id === id ? { ...c, ...patch } : c) } })); updateInSupabase('clients', id, patch) },
@@ -43,6 +42,6 @@ export const useCRMStore = create<CRMState>()(
       deleteContact: (id, p) => { set((s) => ({ contacts: { ...s.contacts, [p]: s.contacts[p].filter((c) => c.id !== id) } })); deleteFromSupabase('contacts', id) },
       moveContactStage: (id, stage, p) => { set((s) => ({ contacts: { ...s.contacts, [p]: s.contacts[p].map((c) => c.id === id ? { ...c, pipelineStage: stage } : c) } })); updateInSupabase('contacts', id, { pipelineStage: stage }) },
     }),
-    { name: 'atlantico-crm' }
+    { name: 'atlantico-crm-v2' }
   )
 )

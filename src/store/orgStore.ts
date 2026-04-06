@@ -47,6 +47,6 @@ export const useOrgStore = create<OrgState>()(
         updateInSupabase('org_nodes', id, { parentId: newParentId })
       },
     }),
-    { name: 'atlantico-org' }
+    { name: 'atlantico-org-v2' }
   )
 )
