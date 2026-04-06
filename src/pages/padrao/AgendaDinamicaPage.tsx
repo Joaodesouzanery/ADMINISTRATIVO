@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { BarChart3, Calendar, Map, Users, TrendingUp, Zap, Eye, Target, Lightbulb, Link, Settings2, ArrowRight, MousePointerClick, GitBranch, MessageSquare, Clock, Gauge } from 'lucide-react'
+import { BarChart3, Calendar, Map, Users, TrendingUp, Zap, Eye, Target, Lightbulb, Link, Settings2, ArrowRight, MousePointerClick, GitBranch, MessageSquare, Clock, Gauge, Info } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { useSchedulingStore } from '../../store/schedulingStore'
 import { ScenarioSelector } from '../../components/scheduling/ScenarioSelector'
@@ -58,6 +58,18 @@ export function AgendaDinamicaPage() {
 
   return (
     <div className="space-y-6">
+      {/* Local-only warning */}
+      <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+        <Info size={16} className="text-amber-600 shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <p className="text-xs font-semibold text-amber-800">Armazenamento local apenas</p>
+          <p className="text-xs text-amber-700 mt-0.5">
+            Cenários da Agenda Dinâmica são salvos apenas neste navegador por enquanto.
+            Eles não sincronizam entre dispositivos nem são persistidos na nuvem.
+          </p>
+        </div>
+      </div>
+
       {/* Header: Scenarios + Evaluate */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">

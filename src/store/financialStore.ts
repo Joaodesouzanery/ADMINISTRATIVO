@@ -13,7 +13,9 @@ interface FinancialState {
   addTransaction: (t: Omit<Transaction, 'id' | 'createdAt'>, p: ProductKey) => void
   updateTransaction: (id: string, patch: Partial<Transaction>, p: ProductKey) => void
   deleteTransaction: (id: string, p: ProductKey) => void
+  addPayroll: (entry: Omit<PayrollEntry, 'id'>, p: ProductKey) => void
   updatePayroll: (id: string, patch: Partial<PayrollEntry>, p: ProductKey) => void
+  deletePayroll: (id: string, p: ProductKey) => void
   addOKR: (okr: Omit<FinancialOKR, 'id'>, p: ProductKey) => void
   updateOKR: (id: string, patch: Partial<FinancialOKR>, p: ProductKey) => void
   deleteOKR: (id: string, p: ProductKey) => void
@@ -41,9 +43,18 @@ export const useFinancialStore = create<FinancialState>()(
         deleteFromSupabase('transactions', id)
       },
 
+      addPayroll: (entry, p) => {
+        const n = { ...entry, id: uid() }
+        set((s) => ({ payroll: { ...s.payroll, [p]: [...s.payroll[p], n] } }))
+        insertToSupabase('payroll', n, p)
+      },
       updatePayroll: (id, patch, p) => {
         set((s) => ({ payroll: { ...s.payroll, [p]: s.payroll[p].map((e) => e.id === id ? { ...e, ...patch } : e) } }))
         updateInSupabase('payroll', id, patch)
+      },
+      deletePayroll: (id, p) => {
+        set((s) => ({ payroll: { ...s.payroll, [p]: s.payroll[p].filter((e) => e.id !== id) } }))
+        deleteFromSupabase('payroll', id)
       },
 
       addOKR: (okr, p) => {

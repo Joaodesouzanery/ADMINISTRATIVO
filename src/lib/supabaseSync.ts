@@ -1,11 +1,19 @@
 import { supabase, isSupabaseEnabled } from './supabase'
+import { useAppStore } from '../store/appStore'
 import type { ProductKey } from '../types'
 
 // Generic helpers to sync Zustand stores ↔ Supabase tables.
 // When Supabase is not configured (no env vars), these are no-ops —
 // the app falls back to localStorage-only via Zustand persist.
+// When any call errors, the message is pushed to useAppStore.syncError
+// so the Topbar SyncStatus indicator can turn red and surface the problem.
 
 type AnyRecord = Record<string, unknown>
+
+export interface SyncResult {
+  ok: boolean
+  error?: string
+}
 
 function snakeToCamel(obj: AnyRecord): AnyRecord {
   const result: AnyRecord = {}
@@ -26,42 +34,76 @@ function camelToSnake(obj: AnyRecord): AnyRecord {
   return result
 }
 
+function reportError(op: string, table: string, message: string) {
+  console.warn(`[supabase] ${op} ${table} error:`, message)
+  try {
+    useAppStore.getState().setSyncError(`${op} ${table}: ${message}`)
+  } catch {
+    // appStore not ready — ignore
+  }
+}
+
+function reportSuccess() {
+  try {
+    const { syncError, setSyncError, setLastSyncAt } = useAppStore.getState()
+    setLastSyncAt(new Date().toISOString())
+    // Clear any stale error on success
+    if (syncError) setSyncError(null)
+  } catch {
+    // ignore
+  }
+}
+
 /** Fetch all rows for a product from a Supabase table */
-export async function fetchFromSupabase<T>(table: string, product: ProductKey): Promise<T[]> {
+export async function fetchFromSupabase<T>(table: string, product: ProductKey | null = null): Promise<T[]> {
   if (!isSupabaseEnabled() || !supabase) return []
-  const { data, error } = await supabase
-    .from(table)
-    .select('*')
-    .eq('product', product)
-    .order('created_at', { ascending: true })
+  let query = supabase.from(table).select('*').order('created_at', { ascending: true })
+  if (product !== null) query = query.eq('product', product)
+  const { data, error } = await query
   if (error) {
-    console.warn(`[supabase] fetch ${table} error:`, error.message)
+    reportError('fetch', table, error.message)
     return []
   }
+  reportSuccess()
   return (data ?? []).map((row) => snakeToCamel(row as AnyRecord) as T)
 }
 
 /** Insert a row into Supabase */
-export async function insertToSupabase(table: string, record: AnyRecord, product: ProductKey): Promise<void> {
-  if (!isSupabaseEnabled() || !supabase) return
+export async function insertToSupabase(table: string, record: AnyRecord, product: ProductKey): Promise<SyncResult> {
+  if (!isSupabaseEnabled() || !supabase) return { ok: true }
   const row = { ...camelToSnake(record), product }
   const { error } = await supabase.from(table).insert(row)
-  if (error) console.warn(`[supabase] insert ${table} error:`, error.message)
+  if (error) {
+    reportError('insert', table, error.message)
+    return { ok: false, error: error.message }
+  }
+  reportSuccess()
+  return { ok: true }
 }
 
 /** Update a row in Supabase by id */
-export async function updateInSupabase(table: string, id: string, patch: AnyRecord): Promise<void> {
-  if (!isSupabaseEnabled() || !supabase) return
+export async function updateInSupabase(table: string, id: string, patch: AnyRecord): Promise<SyncResult> {
+  if (!isSupabaseEnabled() || !supabase) return { ok: true }
   const row = camelToSnake(patch)
   delete row.id // never update PK
   delete row.product // never change product
   const { error } = await supabase.from(table).update(row).eq('id', id)
-  if (error) console.warn(`[supabase] update ${table} error:`, error.message)
+  if (error) {
+    reportError('update', table, error.message)
+    return { ok: false, error: error.message }
+  }
+  reportSuccess()
+  return { ok: true }
 }
 
 /** Delete a row from Supabase by id */
-export async function deleteFromSupabase(table: string, id: string): Promise<void> {
-  if (!isSupabaseEnabled() || !supabase) return
+export async function deleteFromSupabase(table: string, id: string): Promise<SyncResult> {
+  if (!isSupabaseEnabled() || !supabase) return { ok: true }
   const { error } = await supabase.from(table).delete().eq('id', id)
-  if (error) console.warn(`[supabase] delete ${table} error:`, error.message)
+  if (error) {
+    reportError('delete', table, error.message)
+    return { ok: false, error: error.message }
+  }
+  reportSuccess()
+  return { ok: true }
 }

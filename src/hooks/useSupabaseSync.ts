@@ -8,26 +8,74 @@ import { useDocumentStore } from '../store/documentStore'
 import { useNotificationStore } from '../store/notificationStore'
 import { useOrgStore } from '../store/orgStore'
 import { useComercialStore } from '../store/comercialStore'
-import type { ProductKey, KanbanCard, KanbanColumn, Goal, Routine, Task, PlanningGoal, Client, Deal, Contact, Transaction, PayrollEntry, FinancialOKR, Document, Notification, OrgNode, ComercialContact } from '../types'
+import { useFaculdadeStore, type Materia, type AtividadeAcademica } from '../store/faculdadeStore'
+import type {
+  ProductKey,
+  KanbanCard,
+  KanbanColumn,
+  Goal,
+  Routine,
+  Task,
+  PlanningGoal,
+  Client,
+  Deal,
+  Contact,
+  Transaction,
+  PayrollEntry,
+  FinancialOKR,
+  Document,
+  Notification,
+  OrgNode,
+  ComercialContact,
+} from '../types'
 
 /**
- * Loads all data from Supabase into Zustand stores on app startup.
- * Called once per product layout mount.
- * Zustand persist (localStorage) acts as offline cache;
- * Supabase is the source of truth when available.
+ * Loads ALL data from Supabase into Zustand stores on app startup.
+ *
+ * Behavior:
+ * - Runs ONCE per product (tracked by a module-level Set) so navigating
+ *   between products syncs each one the first time it mounts, while avoiding
+ *   redundant fetches on tab switches within the same product.
+ * - ALWAYS writes the fetched array to the store, even if empty — Supabase
+ *   is the source of truth. localStorage is just an offline cache that can
+ *   go stale.
+ * - Faculdade data is fetched once per session (the module has no product
+ *   discriminator — it's a single personal workspace).
+ *
+ * Called from `ProductLayout` which mounts whenever the user enters
+ * `/construdata`, `/iris`, `/padrao`, or `/faculdade`.
  */
+
+// Module-level tracking so a full page refresh re-syncs but tab switches
+// within the same SPA session don't hammer the DB repeatedly.
+const loadedProducts = new Set<ProductKey>()
+let loadedFaculdade = false
+
 export function useSupabaseSync(product: ProductKey) {
-  const loaded = useRef(false)
+  // `tick` is here only to force the effect to re-run during hot reload
+  // without relying on the stale Set from the previous module instance.
+  const tick = useRef(0)
 
   useEffect(() => {
-    if (!isSupabaseEnabled() || loaded.current) return
-    loaded.current = true
+    if (!isSupabaseEnabled()) return
+    if (loadedProducts.has(product)) return
+    loadedProducts.add(product)
+    tick.current++
+
+    let cancelled = false
 
     async function loadAll() {
       console.log(`[supabase] Loading data for ${product}...`)
 
-      // Task store
-      const [cards, columns, goals, routines, tasks, planningGoals] = await Promise.all([
+      // ─── Per-product tables ─────────────────────────────────────────
+      const [
+        cards,
+        columns,
+        goals,
+        routines,
+        tasks,
+        planningGoals,
+      ] = await Promise.all([
         fetchFromSupabase<KanbanCard>('kanban_cards', product),
         fetchFromSupabase<KanbanColumn>('kanban_columns', product),
         fetchFromSupabase<Goal>('goals', product),
@@ -35,79 +83,100 @@ export function useSupabaseSync(product: ProductKey) {
         fetchFromSupabase<Task>('tasks', product),
         fetchFromSupabase<PlanningGoal>('planning_goals', product),
       ])
+      if (cancelled) return
 
-      const taskStore = useTaskStore.getState()
-      if (cards.length > 0) useTaskStore.setState({ cards: { ...taskStore.cards, [product]: cards } })
-      if (columns.length > 0) useTaskStore.setState({ columns: { ...taskStore.columns, [product]: columns } })
-      if (goals.length > 0) useTaskStore.setState({ goals: { ...taskStore.goals, [product]: goals } })
-      if (routines.length > 0) useTaskStore.setState({ routines: { ...taskStore.routines, [product]: routines } })
-      if (tasks.length > 0) useTaskStore.setState({ tasks: { ...taskStore.tasks, [product]: tasks } })
-      if (planningGoals.length > 0) useTaskStore.setState({ planningGoals: { ...taskStore.planningGoals, [product]: planningGoals } })
+      // ALWAYS overwrite — no length guards. Supabase is source of truth.
+      const taskState = useTaskStore.getState()
+      useTaskStore.setState({
+        cards: { ...taskState.cards, [product]: cards },
+        columns: { ...taskState.columns, [product]: columns },
+        goals: { ...taskState.goals, [product]: goals },
+        routines: { ...taskState.routines, [product]: routines },
+        tasks: { ...taskState.tasks, [product]: tasks },
+        planningGoals: { ...taskState.planningGoals, [product]: planningGoals },
+      })
 
-      // CRM store
-      const [clients, deals, contacts] = await Promise.all([
+      const [clients, deals, crmContacts] = await Promise.all([
         fetchFromSupabase<Client>('clients', product),
         fetchFromSupabase<Deal>('deals', product),
         fetchFromSupabase<Contact>('contacts', product),
       ])
+      if (cancelled) return
+      const crmState = useCRMStore.getState()
+      useCRMStore.setState({
+        clients: { ...crmState.clients, [product]: clients },
+        deals: { ...crmState.deals, [product]: deals },
+        contacts: { ...crmState.contacts, [product]: crmContacts },
+      })
 
-      const crmStore = useCRMStore.getState()
-      if (clients.length > 0) useCRMStore.setState({ clients: { ...crmStore.clients, [product]: clients } })
-      if (deals.length > 0) useCRMStore.setState({ deals: { ...crmStore.deals, [product]: deals } })
-      if (contacts.length > 0) useCRMStore.setState({ contacts: { ...crmStore.contacts, [product]: contacts } })
-
-      // Financial store
       const [transactions, payroll, okrs] = await Promise.all([
         fetchFromSupabase<Transaction>('transactions', product),
         fetchFromSupabase<PayrollEntry>('payroll', product),
         fetchFromSupabase<FinancialOKR>('financial_okrs', product),
       ])
+      if (cancelled) return
+      const finState = useFinancialStore.getState()
+      useFinancialStore.setState({
+        transactions: { ...finState.transactions, [product]: transactions },
+        payroll: { ...finState.payroll, [product]: payroll },
+        okrs: { ...finState.okrs, [product]: okrs },
+      })
 
-      const finStore = useFinancialStore.getState()
-      if (transactions.length > 0) useFinancialStore.setState({ transactions: { ...finStore.transactions, [product]: transactions } })
-      if (payroll.length > 0) useFinancialStore.setState({ payroll: { ...finStore.payroll, [product]: payroll } })
-      if (okrs.length > 0) useFinancialStore.setState({ okrs: { ...finStore.okrs, [product]: okrs } })
-
-      // Document store
       const docs = await fetchFromSupabase<Document>('documents', product)
-      if (docs.length > 0) {
-        const docStore = useDocumentStore.getState()
-        useDocumentStore.setState({ documents: { ...docStore.documents, [product]: docs } })
-      }
+      if (cancelled) return
+      const docState = useDocumentStore.getState()
+      useDocumentStore.setState({
+        documents: { ...docState.documents, [product]: docs },
+      })
 
-      // Notification store
       const notifications = await fetchFromSupabase<Notification>('notifications', product)
-      if (notifications.length > 0) {
-        const notifStore = useNotificationStore.getState()
-        useNotificationStore.setState({ notifications: { ...notifStore.notifications, [product]: notifications } })
-      }
+      if (cancelled) return
+      const notifState = useNotificationStore.getState()
+      useNotificationStore.setState({
+        notifications: { ...notifState.notifications, [product]: notifications },
+      })
 
-      // Org store
       const orgNodes = await fetchFromSupabase<OrgNode>('org_nodes', product)
-      if (orgNodes.length > 0) {
-        const orgStore = useOrgStore.getState()
-        useOrgStore.setState({ nodes: { ...orgStore.nodes, [product]: orgNodes } })
-      }
+      if (cancelled) return
+      const orgState = useOrgStore.getState()
+      useOrgStore.setState({
+        nodes: { ...orgState.nodes, [product]: orgNodes },
+      })
 
-      // Comercial store — for Padrão, load contacts from all three products
-      // so the combined pipeline has the full picture
-      const productsToLoadComercial: ProductKey[] = product === 'padrao'
-        ? ['construdata', 'iris', 'padrao']
-        : [product]
-
+      // Comercial — when on Padrão, load contacts from ALL products so the
+      // combined pipeline has everything. Otherwise just the current product.
+      const productsForComercial: ProductKey[] =
+        product === 'padrao' ? ['construdata', 'iris', 'padrao'] : [product]
       const comercialResults = await Promise.all(
-        productsToLoadComercial.map((p) => fetchFromSupabase<ComercialContact>('comercial_contacts', p))
+        productsForComercial.map((p) => fetchFromSupabase<ComercialContact>('comercial_contacts', p))
       )
-      const comStore = useComercialStore.getState()
-      const newComContacts = { ...comStore.contacts }
-      productsToLoadComercial.forEach((p, i) => {
-        if (comercialResults[i].length > 0) newComContacts[p] = comercialResults[i]
+      if (cancelled) return
+      const comState = useComercialStore.getState()
+      const newComContacts = { ...comState.contacts }
+      productsForComercial.forEach((p, i) => {
+        newComContacts[p] = comercialResults[i]
       })
       useComercialStore.setState({ contacts: newComContacts })
+
+      // ─── Faculdade (single workspace, not per-product) ──────────────
+      // Only fetch once per session — first time any ProductLayout mounts.
+      if (!loadedFaculdade) {
+        loadedFaculdade = true
+        const [materias, atividades] = await Promise.all([
+          fetchFromSupabase<Materia>('faculdade_materias', 'faculdade'),
+          fetchFromSupabase<AtividadeAcademica>('faculdade_atividades', 'faculdade'),
+        ])
+        if (cancelled) return
+        useFaculdadeStore.setState({ materias, atividades })
+      }
 
       console.log(`[supabase] Data loaded for ${product}`)
     }
 
     loadAll()
+
+    return () => {
+      cancelled = true
+    }
   }, [product])
 }

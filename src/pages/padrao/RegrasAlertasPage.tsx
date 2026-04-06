@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bell, AlertTriangle, CheckCircle2, Clock, Shield, FlaskConical, GitPullRequest, Plug, Brain, Quote, ChevronDown, ChevronUp, XCircle } from 'lucide-react'
+import { Bell, AlertTriangle, CheckCircle2, Clock, Shield, FlaskConical, GitPullRequest, Plug, Brain, Quote, ChevronDown, ChevronUp, XCircle, Info } from 'lucide-react'
 import { useRulesStore } from '../../store/rulesStore'
 import { RuleList } from '../../components/rules/RuleList'
 import { RuleEditor } from '../../components/rules/RuleEditor'
@@ -40,6 +40,18 @@ export function RegrasAlertasPage() {
 
   return (
     <div className="space-y-6">
+      {/* Local-only warning */}
+      <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
+        <Info size={16} className="text-amber-600 shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <p className="text-xs font-semibold text-amber-800">Armazenamento local apenas</p>
+          <p className="text-xs text-amber-700 mt-0.5">
+            Regras e alertas deste módulo são salvos apenas neste navegador por enquanto.
+            Eles não sincronizam entre dispositivos nem são persistidos na nuvem.
+          </p>
+        </div>
+      </div>
+
       {/* Main two-panel layout */}
       <div className="flex gap-0 bg-white rounded-xl border border-navy-100 overflow-hidden" style={{ height: 'calc(100vh - 220px)' }}>
         {/* Left panel */}
