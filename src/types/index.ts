@@ -159,6 +159,27 @@ export interface Deal {
   createdAt: string
 }
 
+// ─── Comercial Module ────────────────────────────────────────────────────────
+export type ComercialStage =
+  | 'prospeccao'
+  | 'apresentacao'
+  | 'negociacao'
+  | 'fechamento'
+  | 'pos_venda'
+
+export interface ComercialContact {
+  id: string
+  name: string
+  email?: string
+  phone?: string
+  company?: string
+  role?: string
+  stage: ComercialStage
+  value?: number
+  notes?: string
+  createdAt: string
+}
+
 // ─── CRM Contacts / Partners ─────────────────────────────────────────────────
 export type ContactPipelineStage = 'new' | 'contacted' | 'engaged' | 'proposal' | 'closed'
 export type EntityType = 'contact' | 'partner'

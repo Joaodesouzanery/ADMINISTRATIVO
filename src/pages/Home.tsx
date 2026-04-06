@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { Logo } from '../components/brand/Logo'
 import { PRODUCTS } from '../config/products'
-import { ArrowRight, Kanban, FileText, Users, DollarSign, BarChart2, Network, CalendarRange, ShieldAlert, BookOpen, CalendarDays, ClipboardList, LayoutDashboard } from 'lucide-react'
+import { ArrowRight, Kanban, FileText, Users, DollarSign, BarChart2, Network, CalendarRange, ShieldAlert, BookOpen, CalendarDays, ClipboardList, LayoutDashboard, Briefcase } from 'lucide-react'
 
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-  LayoutKanban: Kanban, FileText, Users, DollarSign, BarChart2, Network, CalendarRange, ShieldAlert, BookOpen, CalendarDays, ClipboardList, LayoutDashboard,
+  LayoutKanban: Kanban, FileText, Users, DollarSign, BarChart2, Network, CalendarRange, ShieldAlert, BookOpen, CalendarDays, ClipboardList, LayoutDashboard, Briefcase,
 }
 
 export function Home() {

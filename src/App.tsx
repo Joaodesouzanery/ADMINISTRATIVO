@@ -15,9 +15,12 @@ import { FinancialPage as IRFinancial } from './pages/iris/FinancialPage'
 import { AnalyticsPage as IRAnalytics } from './pages/iris/AnalyticsPage'
 import { OrgChartPage as CDOrgChart } from './pages/construdata/OrgChartPage'
 import { OrgChartPage as IROrgChart } from './pages/iris/OrgChartPage'
+import { ComercialPage as CDComercial } from './pages/construdata/ComercialPage'
+import { ComercialPage as IRComercial } from './pages/iris/ComercialPage'
 
 import { AgendaDinamicaPage as PDAgenda } from './pages/padrao/AgendaDinamicaPage'
 import { RegrasAlertasPage as PDRegras } from './pages/padrao/RegrasAlertasPage'
+import { ComercialPage as PDComercial } from './pages/padrao/ComercialPage'
 
 import { MateriasPage as FCMaterias } from './pages/faculdade/MateriasPage'
 import { CalendarioPage as FCCalendario } from './pages/faculdade/CalendarioPage'
@@ -38,6 +41,7 @@ export default function App() {
           <Route path="financeiro" element={<CDFinancial />} />
           <Route path="relatorios" element={<CDAnalytics />} />
           <Route path="organograma" element={<CDOrgChart />} />
+          <Route path="comercial"  element={<CDComercial />} />
         </Route>
 
         <Route path="/iris" element={<ProductLayout product="iris" />}>
@@ -48,12 +52,14 @@ export default function App() {
           <Route path="financeiro" element={<IRFinancial />} />
           <Route path="relatorios" element={<IRAnalytics />} />
           <Route path="organograma" element={<IROrgChart />} />
+          <Route path="comercial"  element={<IRComercial />} />
         </Route>
 
         <Route path="/padrao" element={<ProductLayout product="padrao" />}>
           <Route index element={<Navigate to="agenda" replace />} />
-          <Route path="agenda" element={<PDAgenda />} />
-          <Route path="regras" element={<PDRegras />} />
+          <Route path="agenda"    element={<PDAgenda />} />
+          <Route path="regras"    element={<PDRegras />} />
+          <Route path="comercial" element={<PDComercial />} />
         </Route>
 
         <Route path="/faculdade" element={<ProductLayout product="faculdade" />}>

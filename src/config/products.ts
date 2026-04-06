@@ -23,11 +23,13 @@ export const MODULES: ModuleConfig[] = [
   { slug: 'financeiro',  label: 'Financeiro',            icon: 'DollarSign',     description: 'Controle financeiro e folha' },
   { slug: 'relatorios',  label: 'Relatórios',            icon: 'BarChart2',      description: 'Dashboards e analytics' },
   { slug: 'organograma', label: 'Organograma',            icon: 'Network',        description: 'Hierarquia e organização' },
+  { slug: 'comercial',   label: 'Comercial',             icon: 'Briefcase',      description: 'Pipeline, funil e playbook comercial' },
 ]
 
 export const PADRAO_MODULES: ModuleConfig[] = [
-  { slug: 'agenda', label: 'Agenda Dinâmica', icon: 'CalendarRange', description: 'Agendamento dinâmico e planejamento' },
-  { slug: 'regras', label: 'Regras e Alertas', icon: 'ShieldAlert', description: 'Regras e alertas em tempo real' },
+  { slug: 'agenda',    label: 'Agenda Dinâmica',  icon: 'CalendarRange', description: 'Agendamento dinâmico e planejamento' },
+  { slug: 'regras',    label: 'Regras e Alertas', icon: 'ShieldAlert',   description: 'Regras e alertas em tempo real' },
+  { slug: 'comercial', label: 'Comercial',        icon: 'Briefcase',     description: 'Pipeline geral (ConstruData + IRIS)' },
 ]
 
 export const FACULDADE_MODULES: ModuleConfig[] = [

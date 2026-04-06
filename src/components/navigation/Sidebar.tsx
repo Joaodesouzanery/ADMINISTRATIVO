@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Kanban, FileText, Users, DollarSign, BarChart2, Network, ChevronLeft, ArrowLeftRight, CalendarRange, ShieldAlert, BookOpen, CalendarDays, ClipboardList, LayoutDashboard } from 'lucide-react'
+import { Kanban, FileText, Users, DollarSign, BarChart2, Network, ChevronLeft, ArrowLeftRight, CalendarRange, ShieldAlert, BookOpen, CalendarDays, ClipboardList, LayoutDashboard, Briefcase } from 'lucide-react'
 import { Logo } from '../brand/Logo'
 import { useAppStore } from '../../store/appStore'
 import { getProduct, PRODUCTS } from '../../config/products'
@@ -19,6 +19,7 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number }>> = {
   CalendarDays,
   ClipboardList,
   LayoutDashboard,
+  Briefcase,
 }
 
 interface SidebarProps {

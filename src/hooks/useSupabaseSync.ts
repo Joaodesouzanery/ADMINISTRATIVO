@@ -7,7 +7,8 @@ import { useFinancialStore } from '../store/financialStore'
 import { useDocumentStore } from '../store/documentStore'
 import { useNotificationStore } from '../store/notificationStore'
 import { useOrgStore } from '../store/orgStore'
-import type { ProductKey, KanbanCard, KanbanColumn, Goal, Routine, Task, PlanningGoal, Client, Deal, Contact, Transaction, PayrollEntry, FinancialOKR, Document, Notification, OrgNode } from '../types'
+import { useComercialStore } from '../store/comercialStore'
+import type { ProductKey, KanbanCard, KanbanColumn, Goal, Routine, Task, PlanningGoal, Client, Deal, Contact, Transaction, PayrollEntry, FinancialOKR, Document, Notification, OrgNode, ComercialContact } from '../types'
 
 /**
  * Loads all data from Supabase into Zustand stores on app startup.
@@ -87,6 +88,22 @@ export function useSupabaseSync(product: ProductKey) {
         const orgStore = useOrgStore.getState()
         useOrgStore.setState({ nodes: { ...orgStore.nodes, [product]: orgNodes } })
       }
+
+      // Comercial store — for Padrão, load contacts from all three products
+      // so the combined pipeline has the full picture
+      const productsToLoadComercial: ProductKey[] = product === 'padrao'
+        ? ['construdata', 'iris', 'padrao']
+        : [product]
+
+      const comercialResults = await Promise.all(
+        productsToLoadComercial.map((p) => fetchFromSupabase<ComercialContact>('comercial_contacts', p))
+      )
+      const comStore = useComercialStore.getState()
+      const newComContacts = { ...comStore.contacts }
+      productsToLoadComercial.forEach((p, i) => {
+        if (comercialResults[i].length > 0) newComContacts[p] = comercialResults[i]
+      })
+      useComercialStore.setState({ contacts: newComContacts })
 
       console.log(`[supabase] Data loaded for ${product}`)
     }
