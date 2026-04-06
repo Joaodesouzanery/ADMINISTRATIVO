@@ -16,6 +16,14 @@ import { AnalyticsPage as IRAnalytics } from './pages/iris/AnalyticsPage'
 import { OrgChartPage as CDOrgChart } from './pages/construdata/OrgChartPage'
 import { OrgChartPage as IROrgChart } from './pages/iris/OrgChartPage'
 
+import { AgendaDinamicaPage as PDAgenda } from './pages/padrao/AgendaDinamicaPage'
+import { RegrasAlertasPage as PDRegras } from './pages/padrao/RegrasAlertasPage'
+
+import { MateriasPage as FCMaterias } from './pages/faculdade/MateriasPage'
+import { CalendarioPage as FCCalendario } from './pages/faculdade/CalendarioPage'
+import { AtividadesPage as FCAtividades } from './pages/faculdade/AtividadesPage'
+import { Visao360Page as FCVisao360 } from './pages/faculdade/Visao360Page'
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -40,6 +48,20 @@ export default function App() {
           <Route path="financeiro" element={<IRFinancial />} />
           <Route path="relatorios" element={<IRAnalytics />} />
           <Route path="organograma" element={<IROrgChart />} />
+        </Route>
+
+        <Route path="/padrao" element={<ProductLayout product="padrao" />}>
+          <Route index element={<Navigate to="agenda" replace />} />
+          <Route path="agenda" element={<PDAgenda />} />
+          <Route path="regras" element={<PDRegras />} />
+        </Route>
+
+        <Route path="/faculdade" element={<ProductLayout product="faculdade" />}>
+          <Route index element={<Navigate to="materias" replace />} />
+          <Route path="materias"   element={<FCMaterias />} />
+          <Route path="calendario" element={<FCCalendario />} />
+          <Route path="atividades" element={<FCAtividades />} />
+          <Route path="visao360"   element={<FCVisao360 />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

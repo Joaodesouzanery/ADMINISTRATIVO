@@ -16,7 +16,7 @@ interface NotificationState {
 export const useNotificationStore = create<NotificationState>()(
   persist(
     (set) => ({
-      notifications: { construdata: [], iris: [] },
+      notifications: { construdata: [], iris: [], padrao: [], faculdade: [] },
 
       addNotification: (n, product) => {
         const newN = { ...n, id: uid(), read: false, createdAt: new Date().toISOString() }

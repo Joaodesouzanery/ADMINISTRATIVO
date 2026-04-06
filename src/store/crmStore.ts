@@ -26,9 +26,9 @@ interface CRMState {
 export const useCRMStore = create<CRMState>()(
   persist(
     (set) => ({
-      clients: { construdata: cdCrm.clients, iris: irisCrm.clients },
-      deals: { construdata: cdCrm.deals, iris: irisCrm.deals },
-      contacts: { construdata: [], iris: [] },
+      clients: { construdata: cdCrm.clients, iris: irisCrm.clients, padrao: [], faculdade: [] },
+      deals: { construdata: cdCrm.deals, iris: irisCrm.deals, padrao: [], faculdade: [] },
+      contacts: { construdata: [], iris: [], padrao: [], faculdade: [] },
 
       addClient: (c, p) => { const n = { ...c, id: uid(), createdAt: new Date().toISOString() }; set((s) => ({ clients: { ...s.clients, [p]: [...s.clients[p], n] } })); insertToSupabase('clients', n, p) },
       updateClient: (id, patch, p) => { set((s) => ({ clients: { ...s.clients, [p]: s.clients[p].map((c) => c.id === id ? { ...c, ...patch } : c) } })); updateInSupabase('clients', id, patch) },

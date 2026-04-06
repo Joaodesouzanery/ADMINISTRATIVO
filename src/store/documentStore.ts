@@ -17,7 +17,7 @@ interface DocumentState {
 export const useDocumentStore = create<DocumentState>()(
   persist(
     (set) => ({
-      documents: { construdata: cdDocs.documents, iris: irisDocs.documents },
+      documents: { construdata: cdDocs.documents, iris: irisDocs.documents, padrao: [], faculdade: [] },
 
       addDocument: (d, p) => {
         const n = { ...d, id: uid(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }

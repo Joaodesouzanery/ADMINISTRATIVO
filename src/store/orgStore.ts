@@ -16,7 +16,7 @@ interface OrgState {
 export const useOrgStore = create<OrgState>()(
   persist(
     (set) => ({
-      nodes: { construdata: [], iris: [] },
+      nodes: { construdata: [], iris: [], padrao: [], faculdade: [] },
 
       addNode: (node, product) => {
         const n = { ...node, id: uid(), createdAt: new Date().toISOString() }

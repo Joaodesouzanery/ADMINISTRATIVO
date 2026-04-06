@@ -1,4 +1,4 @@
-export type ProductKey = 'construdata' | 'iris'
+export type ProductKey = 'construdata' | 'iris' | 'padrao' | 'faculdade'
 
 export interface ModuleConfig {
   slug: string
@@ -25,6 +25,18 @@ export const MODULES: ModuleConfig[] = [
   { slug: 'organograma', label: 'Organograma',            icon: 'Network',        description: 'Hierarquia e organização' },
 ]
 
+export const PADRAO_MODULES: ModuleConfig[] = [
+  { slug: 'agenda', label: 'Agenda Dinâmica', icon: 'CalendarRange', description: 'Agendamento dinâmico e planejamento' },
+  { slug: 'regras', label: 'Regras e Alertas', icon: 'ShieldAlert', description: 'Regras e alertas em tempo real' },
+]
+
+export const FACULDADE_MODULES: ModuleConfig[] = [
+  { slug: 'materias',   label: 'Matérias',           icon: 'BookOpen',      description: 'Disciplinas e informações' },
+  { slug: 'calendario', label: 'Calendário',         icon: 'CalendarDays',  description: 'Provas, atividades e datas' },
+  { slug: 'atividades', label: 'Atividades',         icon: 'ClipboardList', description: 'Trabalhos, listas e entregas' },
+  { slug: 'visao360',   label: 'Visão 360°',         icon: 'LayoutDashboard', description: 'Panorama geral de tudo' },
+]
+
 export const PRODUCTS: ProductConfig[] = [
   {
     key: 'construdata',
@@ -41,6 +53,22 @@ export const PRODUCTS: ProductConfig[] = [
     color: '#7DD4A8',
     description: 'Plataforma de inteligência e dados empresariais',
     modules: MODULES,
+  },
+  {
+    key: 'padrao',
+    name: 'Padrão',
+    fullName: 'Atlântico Padrão',
+    color: '#F59E0B',
+    description: 'Módulo administrativo geral com agendamento dinâmico e alertas',
+    modules: PADRAO_MODULES,
+  },
+  {
+    key: 'faculdade',
+    name: 'Faculdade',
+    fullName: 'Atlântico Faculdade',
+    color: '#8B5CF6',
+    description: 'Gestão acadêmica: matérias, provas, atividades e alertas',
+    modules: FACULDADE_MODULES,
   },
 ]
 
