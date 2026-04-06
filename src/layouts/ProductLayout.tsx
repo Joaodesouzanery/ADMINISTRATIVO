@@ -4,6 +4,7 @@ import { Sidebar } from '../components/navigation/Sidebar'
 import { Topbar } from '../components/navigation/Topbar'
 import { useAppStore } from '../store/appStore'
 import { useNotificationEngine } from '../hooks/useNotificationEngine'
+import { useSupabaseSync } from '../hooks/useSupabaseSync'
 import type { ProductKey } from '../config/products'
 
 interface ProductLayoutProps {
@@ -12,6 +13,7 @@ interface ProductLayoutProps {
 
 export function ProductLayout({ product }: ProductLayoutProps) {
   const setActiveProduct = useAppStore((s) => s.setActiveProduct)
+  useSupabaseSync(product)
   useNotificationEngine(product)
 
   useEffect(() => {

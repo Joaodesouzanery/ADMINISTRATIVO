@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Client, Deal, Contact, ContactPipelineStage, ProductKey } from '../types'
+import { insertToSupabase, updateInSupabase, deleteFromSupabase } from '../lib/supabaseSync'
 import * as cdCrm from '../data/construdata/crm'
 import * as irisCrm from '../data/iris/crm'
 
@@ -29,18 +30,18 @@ export const useCRMStore = create<CRMState>()(
       deals: { construdata: cdCrm.deals, iris: irisCrm.deals },
       contacts: { construdata: [], iris: [] },
 
-      addClient: (c, p) => set((s) => ({ clients: { ...s.clients, [p]: [...s.clients[p], { ...c, id: uid(), createdAt: new Date().toISOString() }] } })),
-      updateClient: (id, patch, p) => set((s) => ({ clients: { ...s.clients, [p]: s.clients[p].map((c) => c.id === id ? { ...c, ...patch } : c) } })),
-      deleteClient: (id, p) => set((s) => ({ clients: { ...s.clients, [p]: s.clients[p].filter((c) => c.id !== id) } })),
+      addClient: (c, p) => { const n = { ...c, id: uid(), createdAt: new Date().toISOString() }; set((s) => ({ clients: { ...s.clients, [p]: [...s.clients[p], n] } })); insertToSupabase('clients', n, p) },
+      updateClient: (id, patch, p) => { set((s) => ({ clients: { ...s.clients, [p]: s.clients[p].map((c) => c.id === id ? { ...c, ...patch } : c) } })); updateInSupabase('clients', id, patch) },
+      deleteClient: (id, p) => { set((s) => ({ clients: { ...s.clients, [p]: s.clients[p].filter((c) => c.id !== id) } })); deleteFromSupabase('clients', id) },
 
-      addDeal: (d, p) => set((s) => ({ deals: { ...s.deals, [p]: [...s.deals[p], { ...d, id: uid(), createdAt: new Date().toISOString() }] } })),
-      updateDeal: (id, patch, p) => set((s) => ({ deals: { ...s.deals, [p]: s.deals[p].map((d) => d.id === id ? { ...d, ...patch } : d) } })),
-      deleteDeal: (id, p) => set((s) => ({ deals: { ...s.deals, [p]: s.deals[p].filter((d) => d.id !== id) } })),
+      addDeal: (d, p) => { const n = { ...d, id: uid(), createdAt: new Date().toISOString() }; set((s) => ({ deals: { ...s.deals, [p]: [...s.deals[p], n] } })); insertToSupabase('deals', n, p) },
+      updateDeal: (id, patch, p) => { set((s) => ({ deals: { ...s.deals, [p]: s.deals[p].map((d) => d.id === id ? { ...d, ...patch } : d) } })); updateInSupabase('deals', id, patch) },
+      deleteDeal: (id, p) => { set((s) => ({ deals: { ...s.deals, [p]: s.deals[p].filter((d) => d.id !== id) } })); deleteFromSupabase('deals', id) },
 
-      addContact: (c, p) => set((s) => ({ contacts: { ...s.contacts, [p]: [...s.contacts[p], { ...c, id: uid(), createdAt: new Date().toISOString() }] } })),
-      updateContact: (id, patch, p) => set((s) => ({ contacts: { ...s.contacts, [p]: s.contacts[p].map((c) => c.id === id ? { ...c, ...patch } : c) } })),
-      deleteContact: (id, p) => set((s) => ({ contacts: { ...s.contacts, [p]: s.contacts[p].filter((c) => c.id !== id) } })),
-      moveContactStage: (id, stage, p) => set((s) => ({ contacts: { ...s.contacts, [p]: s.contacts[p].map((c) => c.id === id ? { ...c, pipelineStage: stage } : c) } })),
+      addContact: (c, p) => { const n = { ...c, id: uid(), createdAt: new Date().toISOString() }; set((s) => ({ contacts: { ...s.contacts, [p]: [...s.contacts[p], n] } })); insertToSupabase('contacts', n, p) },
+      updateContact: (id, patch, p) => { set((s) => ({ contacts: { ...s.contacts, [p]: s.contacts[p].map((c) => c.id === id ? { ...c, ...patch } : c) } })); updateInSupabase('contacts', id, patch) },
+      deleteContact: (id, p) => { set((s) => ({ contacts: { ...s.contacts, [p]: s.contacts[p].filter((c) => c.id !== id) } })); deleteFromSupabase('contacts', id) },
+      moveContactStage: (id, stage, p) => { set((s) => ({ contacts: { ...s.contacts, [p]: s.contacts[p].map((c) => c.id === id ? { ...c, pipelineStage: stage } : c) } })); updateInSupabase('contacts', id, { pipelineStage: stage }) },
     }),
     { name: 'atlantico-crm' }
   )

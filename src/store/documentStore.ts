@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { Document, ProductKey } from '../types'
+import { insertToSupabase, updateInSupabase, deleteFromSupabase } from '../lib/supabaseSync'
 import * as cdDocs from '../data/construdata/documents'
 import * as irisDocs from '../data/iris/documents'
 
@@ -18,23 +19,22 @@ export const useDocumentStore = create<DocumentState>()(
     (set) => ({
       documents: { construdata: cdDocs.documents, iris: irisDocs.documents },
 
-      addDocument: (d, p) => set((s) => ({
-        documents: {
-          ...s.documents,
-          [p]: [...s.documents[p], { ...d, id: uid(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }],
-        },
-      })),
+      addDocument: (d, p) => {
+        const n = { ...d, id: uid(), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+        set((s) => ({ documents: { ...s.documents, [p]: [...s.documents[p], n] } }))
+        insertToSupabase('documents', n, p)
+      },
 
-      updateDocument: (id, patch, p) => set((s) => ({
-        documents: {
-          ...s.documents,
-          [p]: s.documents[p].map((d) => d.id === id ? { ...d, ...patch, updatedAt: new Date().toISOString() } : d),
-        },
-      })),
+      updateDocument: (id, patch, p) => {
+        const patchWithDate = { ...patch, updatedAt: new Date().toISOString() }
+        set((s) => ({ documents: { ...s.documents, [p]: s.documents[p].map((d) => d.id === id ? { ...d, ...patchWithDate } : d) } }))
+        updateInSupabase('documents', id, patchWithDate)
+      },
 
-      deleteDocument: (id, p) => set((s) => ({
-        documents: { ...s.documents, [p]: s.documents[p].filter((d) => d.id !== id) },
-      })),
+      deleteDocument: (id, p) => {
+        set((s) => ({ documents: { ...s.documents, [p]: s.documents[p].filter((d) => d.id !== id) } }))
+        deleteFromSupabase('documents', id)
+      },
     }),
     { name: 'atlantico-documents' }
   )
