@@ -20,7 +20,8 @@ function camelToSnake(obj: AnyRecord): AnyRecord {
   const result: AnyRecord = {}
   for (const [key, value] of Object.entries(obj)) {
     const snakeKey = key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`)
-    result[snakeKey] = value
+    // Convert undefined to null so Supabase clears the field
+    result[snakeKey] = value === undefined ? null : value
   }
   return result
 }
