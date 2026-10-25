@@ -20,4 +20,9 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Funções serverless e scripts rodam em Node, não no navegador.
+    files: ['api/**/*.ts', 'scripts/**/*.mjs'],
+    languageOptions: { globals: globals.node },
+  },
 ])
