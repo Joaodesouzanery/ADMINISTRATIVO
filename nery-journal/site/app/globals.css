@@ -4,7 +4,7 @@
   --muted: #5f6368;
   --line: #e3e3e3;
   --soft: #f5f5f3;
-  --accent: #ffc21a;       /* amarelo-capacete */
+  --accent: #3da9d6;       /* azul claro (CTA) */
   --accent-ink: #111111;
   --dark: #0b0b0b;
   --max: 1280px;
@@ -26,8 +26,7 @@ a { color: inherit; }
 .header { border-bottom: 1px solid var(--line); background: #fff; position: sticky; top: 0; z-index: 20; }
 .header .top { display: flex; align-items: center; justify-content: space-between; padding: 14px 0 6px; gap: 16px; }
 .logo { text-decoration: none; display: inline-flex; flex-direction: column; line-height: 1; }
-.logo .mark { font: 800 30px/1 var(--font); letter-spacing: -.03em; text-transform: lowercase; }
-.logo .mark::after { content: ""; display: block; width: 28px; height: 6px; background: var(--accent); margin-top: 4px; }
+.logo .logoimg { height: 38px; width: auto; display: block; }
 .logo .group { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
 .util { display: flex; gap: 22px; font-size: 14px; color: #333; }
 .util a { text-decoration: none; }
@@ -141,3 +140,36 @@ a { color: inherit; }
   .nav ul { gap: 16px; font-size: 14px; }
   .feedback { display: none; }
 }
+
+/* Espaços de patrocínio */
+.adslot { position: relative; margin: 16px 0; border: 1px dashed #cfd6db; border-radius: 6px; background: #fafbfc; display: grid; place-items: center; text-align: center; overflow: hidden; }
+.adslot .adlabel { position: absolute; top: 4px; left: 8px; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #8a949c; }
+.adslot a { text-decoration: none; display: grid; place-items: center; width: 100%; height: 100%; color: #333; }
+.adslot .adplaceholder b { font-weight: 600; } .adslot .adplaceholder small { color: #8a949c; display: block; }
+.adslot img { max-width: 100%; height: auto; display: block; }
+.slot-leaderboard { min-height: 90px; } .slot-mpu { min-height: 250px; margin: 0 0 32px; } .slot-footer { min-height: 70px; margin: 0 0 28px; } .slot-native { min-height: 200px; }
+
+/* Newsletter: hero e formulário */
+.nhero { background: #0b0b0b url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path d="M0 40L40 0" stroke="%23ffffff" stroke-opacity=".05" stroke-width="2"/></svg>'); color: #fff; padding: 56px 0 48px; border-bottom: 6px solid var(--accent); }
+.nhero h1 { font-weight: 300; font-size: 44px; line-height: 1.1; margin: 0 0 16px; max-width: 760px; }
+.nhero p { max-width: 760px; font-size: 17px; margin: 0; color: #e6e6e6; }
+.nform { max-width: 820px; margin: 32px auto 72px; display: grid; gap: 14px; position: relative; }
+.nform h2 { font-weight: 400; font-size: 26px; margin: 18px 0 0; }
+.nform .req { color: var(--muted); font-size: 13px; margin: 0; }
+.nform label { display: grid; gap: 6px; font-size: 14px; color: #333; }
+.nform input[type=text], .nform input[type=email], .nform input:not([type]), .nform select, .nform textarea { border: 1px solid #c9c9c9; border-radius: 6px; padding: 12px; font-size: 15px; font-family: inherit; width: 100%; background: #fff; }
+.nform .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.nform fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; gap: 10px; }
+.nform legend { font-weight: 600; padding: 0 6px; font-size: 14px; }
+.nform .chk { display: flex; gap: 10px; align-items: flex-start; }
+.nform .chk input { margin-top: 4px; }
+.nform .consent { font-size: 12px; color: #555; margin: 4px 0 0; }
+.nform .ufs { display: flex; flex-wrap: wrap; gap: 8px; }
+.nform .uf { display: inline-flex; gap: 0; border: 1px solid #c9c9c9; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-size: 13px; background: #fff; }
+.nform .uf input { position: absolute; opacity: 0; pointer-events: none; }
+.nform .uf.on { background: var(--accent); border-color: var(--accent); font-weight: 600; }
+.ferr { color: #b3261e; font-size: 14px; margin: 0; }
+.formats { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 10px; }
+.formats li { border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; display: grid; gap: 2px; }
+.formats li span { color: var(--muted); font-size: 14px; }
+@media (max-width: 600px) { .nform .grid2 { grid-template-columns: 1fr; } .nhero h1 { font-size: 32px; } }

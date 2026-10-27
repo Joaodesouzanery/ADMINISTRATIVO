@@ -1,6 +1,7 @@
 import { getArticles, fmtDate, INDICADORES_PLACEHOLDER, LICITACOES_PLACEHOLDER } from '@/lib/data'
 import { NewsCard } from '@/components/Cards'
 import Newsletter from '@/components/Newsletter'
+import AdSlot from '@/components/AdSlot'
 import Link from 'next/link'
 
 export const revalidate = 300
@@ -30,6 +31,7 @@ export default async function Noticias() {
           {rest.map((a) => <NewsCard key={a.slug} a={a} />)}
         </section>
         <aside className="side">
+          <AdSlot slot="mpu" />
           <section id="indicadores">
             <h3>Indicadores</h3>
             <ul>

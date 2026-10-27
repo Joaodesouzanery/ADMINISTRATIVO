@@ -76,5 +76,29 @@ export async function getArticle(slug: string): Promise<ArticleRow | null> {
   return all.find((a) => a.slug === slug) ?? null
 }
 
+export interface Campaign {
+  id: string
+  advertiser: string
+  slot: string
+  image_url: string | null
+  alt_text: string | null
+  headline: string | null
+  link_url: string
+  label: string
+}
+
+/** Campanha ativa para o espaço (RLS só expõe campanhas ativas e dentro do período). */
+export async function getCampaign(slot: string): Promise<Campaign | null> {
+  const db = client()
+  if (!db) return null
+  try {
+    const { data } = await db.from('nj_campaigns').select('id,advertiser,slot,image_url,alt_text,headline,link_url,label')
+      .eq('slot', slot).order('created_at', { ascending: false }).limit(1)
+    return (data?.[0] as Campaign | undefined) ?? null
+  } catch {
+    return null
+  }
+}
+
 export const fmtDate = (iso: string | null) =>
   iso ? new Date(iso).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short', year: 'numeric' }) : ''

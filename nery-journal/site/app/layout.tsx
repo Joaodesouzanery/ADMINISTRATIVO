@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Header, Footer } from '@/components/Chrome'
+import { Header, Footer, TopAd } from '@/components/Chrome'
 import Newsletter from '@/components/Newsletter'
 
 const indexable = process.env.NEXT_PUBLIC_INDEXABLE === '1'
@@ -21,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {!indexable && <div className="notice"><b>Em construção.</b> Conteúdo de <b>exemplo</b> para validar o layout; nada aqui é notícia real.</div>}
         <Header />
+        <TopAd />
         <main>{children}</main>
         <Footer />
         <a className="feedback" href="/sobre#contato">Feedback</a>
